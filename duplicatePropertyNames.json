@@ -1,0 +1,32 @@
+{
+    // Surprisingly, this template succeeds (always grabs the second property definition)
+
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "centralus"
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "westus"
+        }
+    },
+    "variables": {
+        "location2": "[parameters('location')]",
+        "location2": "hello there"
+    },
+    "resources": [
+    ],
+    "outputs": {
+        "output1": {
+            "type": "bool",
+            "value": true
+        },
+        "output1": {
+            "type": "bool",
+            "value": false
+        }
+    }
+}
