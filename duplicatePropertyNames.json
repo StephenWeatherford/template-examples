@@ -22,19 +22,27 @@
     "outputs": {
         "output1": {
             "type": "bool",
-            "value": true
+            "value": false
         },
         "output1": {
             "type": "bool",
-            "value": false
+            "value": true
         },
         "caseInsensitiveOutput": {
             "type": "string",
-            "value": "one"
+            "value": "caseInsensitiveOutput"
         },
         "caseinsensitiveoutput": { // These should still be marked as duplicate properties
             "type": "string",
-            "value": "two"
+            "value": "caseinsensitiveoutput"
+        },
+        "Strasse": {
+            "type": "string",
+            "value": "Strasse"
+        },
+        "Straße": {
+            "type": "string",
+            "value": "Straße"
         }
     }
 }
