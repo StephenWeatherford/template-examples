@@ -27,6 +27,14 @@
         "output1": {
             "type": "bool",
             "value": false
+        },
+        "caseInsensitiveOutput": {
+            "type": "string",
+            "value": "one"
+        },
+        "caseinsensitiveoutput": { // These should still be marked as duplicate properties
+            "type": "string",
+            "value": "two"
         }
     }
 }
