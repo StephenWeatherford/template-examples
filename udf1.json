@@ -62,7 +62,8 @@
           }
         },
         "getSubscriptionId": {
-          "parameters": [],
+          "parameters": [
+          ],
           "output": {
             "type": "string",
             "value": "[subscription().subscriptionId]"
@@ -104,7 +105,8 @@
     "condition2": "[udf.even(3)]",
     "subscriptionId": "[udf.getSubscriptionId()]"
   },
-  "resources": [],
+  "resources": [
+  ],
   "outputs": {
     "o1": {
       "type": "string",
@@ -130,20 +132,20 @@
       "type": "string",
       "value": "[variables('uri')]"
     },
-        "time": {
+    "time": {
       "type": "string",
       "value": "[variables('time')]"
     },
-            "subscriptionId": {
+    "subscriptionId": {
       "type": "string",
       "value": "[variables('subscriptionId')]"
     },
-            "condition1": {
-      "type": "string",
+    "condition1": {
+      "type": "bool",
       "value": "[variables('condition1')]"
     },
-            "condition2": {
-      "type": "string",
+    "condition2": {
+      "type": "BOOL",
       "value": "[variables('condition2')]"
     }
   }
