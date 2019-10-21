@@ -1,0 +1,117 @@
+{
+  "id": "/subscriptions/5d17327f-ed05-4b65-bfd1-f498ac160d55/providers/Microsoft.Resources/deployments/variable-copy-sample",
+  "location": "westus",
+  "name": "variable-copy-sample",
+  "properties": {
+    "correlationId": "4bdf37f8-8ce6-471d-b327-445ad92bb0b1",
+    "debugSetting": null,
+    "dependencies": [],
+    "duration": "PT2.440029S",
+    "mode": "Incremental",
+    "onErrorDeployment": null,
+    "outputResources": [],
+    "outputs": {
+      "exampleArray": {
+        "type": "Array",
+        "value": [
+          {
+            "diskIndex": 0,
+            "diskSizeGB": "1",
+            "name": "myDataDisk1"
+          },
+          {
+            "diskIndex": 1,
+            "diskSizeGB": "1",
+            "name": "myDataDisk2"
+          },
+          {
+            "diskIndex": 2,
+            "diskSizeGB": "1",
+            "name": "myDataDisk3"
+          },
+          {
+            "diskIndex": 3,
+            "diskSizeGB": "1",
+            "name": "myDataDisk4"
+          },
+          {
+            "diskIndex": 4,
+            "diskSizeGB": "1",
+            "name": "myDataDisk5"
+          }
+        ]
+      },
+      "exampleArrayOnObject": {
+        "type": "Array",
+        "value": [
+          {
+            "diskIndex": 0,
+            "diskSizeGB": "1",
+            "name": "myDataDisk1"
+          },
+          {
+            "diskIndex": 1,
+            "diskSizeGB": "1",
+            "name": "myDataDisk2"
+          },
+          {
+            "diskIndex": 2,
+            "diskSizeGB": "1",
+            "name": "myDataDisk3"
+          },
+          {
+            "diskIndex": 3,
+            "diskSizeGB": "1",
+            "name": "myDataDisk4"
+          },
+          {
+            "diskIndex": 4,
+            "diskSizeGB": "1",
+            "name": "myDataDisk5"
+          }
+        ]
+      },
+      "exampleObject": {
+        "type": "Object",
+        "value": {
+          "disks": [
+            {
+              "diskIndex": 0,
+              "diskSizeGB": "1",
+              "name": "myDataDisk1"
+            },
+            {
+              "diskIndex": 1,
+              "diskSizeGB": "1",
+              "name": "myDataDisk2"
+            },
+            {
+              "diskIndex": 2,
+              "diskSizeGB": "1",
+              "name": "myDataDisk3"
+            },
+            {
+              "diskIndex": 3,
+              "diskSizeGB": "1",
+              "name": "myDataDisk4"
+            },
+            {
+              "diskIndex": 4,
+              "diskSizeGB": "1",
+              "name": "myDataDisk5"
+            }
+          ]
+        }
+      }
+    },
+    "parameters": {},
+    "parametersLink": null,
+    "providers": [],
+    "provisioningState": "Succeeded",
+    "template": null,
+    "templateHash": "3733966369217598196",
+    "templateLink": null,
+    "timestamp": "2019-10-21T01:51:29.768861+00:00"
+  },
+  "type": null
+}
