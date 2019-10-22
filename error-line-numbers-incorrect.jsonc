@@ -1,0 +1,30 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "functions": [
+        {
+            "namespace": "udf",
+            "members": {
+                "a": {
+                    "output": {
+                        "value": "[variables('var1')]",
+                        "type": "int",
+                        "metadata": {
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "resources": [
+    ],
+    "variables": {
+        "var1": "hi"
+    }
+}
+
+// Deployment gives this:
+// New-AzResourceGroupDeployment : 3:29:56 PM - Error: Code=InvalidTemplate; Message=Deployment template validation failed: 'The template function 'a' at line '11' and column '25' is not valid. 
+// These function calls are not supported in a function definition: 'variables'. Please see https://aka.ms/arm-template/#functions for usage details.'.
+//
+// EXPECTED: It's not clear 
