@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
-  "functions": [
+  "Functions": [
     {
       "namespace": "udf",
       "members": {
@@ -34,7 +34,7 @@
           ],
           "output": {
             "type": "string",
-            "value": "[concat(string(parameters('year')), '-', string(parameters('month')), '-', string(parameters('day')))]"
+            "value": "[concat(string(parameters('YEAR')), '-', string(parameters('Month')), '-', string(parameters('day')))]"
           }
         },
         "odd": {
@@ -62,7 +62,8 @@
           }
         },
         "getSubscriptionId": {
-          "parameters": [],
+          "parameters": [
+          ],
           "output": {
             "type": "string",
             "value": "[subscription().subscriptionId]"
@@ -71,7 +72,7 @@
       }
     }
   ],
-  "parameters": {
+  "Parameters": {
     "p1": {
       "type": "string",
       "defaultValue": "[udf.storageUri('p1')]"
@@ -93,18 +94,28 @@
       "defaultValue": "[udf.getSubscriptionId()]"
     },
     "storageAccountName": {
-      "type": "string",
-      "defaultValue": "deleteme"
+      "type": "string"
     }
   },
-  "variables": {
+  "Variables": {
     "uri": "[udf.storageUri('uri')]",
     "time": "[udf.date(2017, 11, 2)]",
     "condition1": "[udf.odd(3)]",
     "condition2": "[udf.even(3)]",
     "subscriptionId": "[udf.getSubscriptionId()]"
   },
-  "resources": [],
+  "Resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[parameters('storageAccountName')]",
+      "apiVersion": "2015-06-15",
+      "location": "East US",
+      "condition": "[udf.odd(3)]",
+      "properties": {
+        "accountType": "Standard_LRS"
+      }
+    }
+  ],
   "outputs": {
     "o1": {
       "type": "string",
@@ -126,25 +137,45 @@
       "type": "string",
       "value": "[udf.getSubscriptionId()]"
     },
-    "uri": {
+    "o6": {
       "type": "string",
       "value": "[variables('uri')]"
     },
-        "time": {
+    "o7": {
       "type": "string",
       "value": "[variables('time')]"
     },
-            "subscriptionId": {
-      "type": "string",
-      "value": "[variables('subscriptionId')]"
-    },
-            "condition1": {
+    "o8": {
       "type": "string",
       "value": "[variables('condition1')]"
     },
-            "condition2": {
+    "o9": {
       "type": "string",
       "value": "[variables('condition2')]"
+    },
+    "o10": {
+      "type": "string",
+      "value": "[variables('subscriptionId')]"
+    },
+    "o11": {
+      "type": "string",
+      "value": "[parameters('p1')]"
+    },
+    "o12": {
+      "type": "string",
+      "value": "[parameters('p2')]"
+    },
+    "o13": {
+      "type": "string",
+      "value": "[parameters('p3')]"
+    },
+    "o14": {
+      "type": "string",
+      "value": "[parameters('p4')]"
+    },
+    "o15": {
+      "type": "string",
+      "value": "[parameters('p5')]"
     }
   }
 }
