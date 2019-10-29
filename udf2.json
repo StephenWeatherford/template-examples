@@ -1,0 +1,70 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "functions": [
+        {
+            "namespace": "udf",
+            "members": {
+                "date": {
+                    "parameters": [
+                        {
+                            "name": "year",
+                            "type": "Int"
+                        },
+                        {
+                            "name": "month",
+                            "type": "Int"
+                        },
+                        {
+                            "name": "day",
+                            "type": "Int"
+                        }
+                    ],
+                    "output": {
+                        "type": "string",
+                        "value": "[concat(string(parameters('year')), '-', string(parameters('month')), '-', string(parameters('day')))]"
+                    }
+                }
+            }
+        }
+    ],
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('year')]",
+            "apiVersion": "[parameters('apiVersion')]",
+            "location": "westus"
+        }
+    ],
+    "parameters": {
+        "year": {
+            "type": "string",
+            "defaultValue": "2010"
+        },
+        "apiVersion": {
+            "type": "string",
+            "defaultValue": "2010"
+        }
+    },
+    "variables": {
+        "var1": {
+            "a": {
+                "b": {
+                    "c": 16180339887498948482
+                },
+                "d": 42
+            }
+        },
+        "var2": "[variables('var1')]"
+    },
+    "outputs": {
+        "output1": {
+            "type": "int",
+            "value": "[variables('var1')]"
+        },
+        "output2": {
+            "type": "string",
+            "value": "[udf.date(2019, 10, 5)]"
+        }
+    }
+}
