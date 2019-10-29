@@ -53,6 +53,8 @@
       "value": "[variables('disk-array-on-object')]",
       "type": "object"
     },
+
+
       /*
       "exampleArrayOnObject": {
         "type": "Array",
@@ -75,6 +77,7 @@
       "value": "[variables('disk-array-on-object').disks]",
       "type" : "array"
     },
+
 
       /*
       "exampleArray": {

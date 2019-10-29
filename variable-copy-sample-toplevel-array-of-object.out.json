@@ -1,0 +1,85 @@
+{
+  "id": "/subscriptions/5d17327f-ed05-4b65-bfd1-f498ac160d55/providers/Microsoft.Resources/deployments/variable-copy-sample-toplevel-array-of-object",
+  "location": "westus",
+  "name": "variable-copy-sample-toplevel-array-of-object",
+  "properties": {
+    "correlationId": "ad8d8c37-14f2-4cd3-b7ad-f81fcd1843f0",
+    "debugSetting": null,
+    "dependencies": [],
+    "duration": "PT0.948606S",
+    "mode": "Incremental",
+    "onErrorDeployment": null,
+    "outputResources": [],
+    "outputs": {
+      "o1ArrayOfObject": {
+        "type": "Array",
+        "value": [
+          {
+            "data": {
+              "diskSizeGB": 1
+            },
+            "diskIndex": 0,
+            "name": "myDataDisk1"
+          },
+          {
+            "data": {
+              "diskSizeGB": 1
+            },
+            "diskIndex": 1,
+            "name": "myDataDisk2"
+          },
+          {
+            "data": {
+              "diskSizeGB": 1
+            },
+            "diskIndex": 2,
+            "name": "myDataDisk3"
+          },
+          {
+            "data": {
+              "diskSizeGB": 1
+            },
+            "diskIndex": 3,
+            "name": "myDataDisk4"
+          },
+          {
+            "data": {
+              "diskSizeGB": 1
+            },
+            "diskIndex": 4,
+            "name": "myDataDisk5"
+          }
+        ]
+      },
+      "o2Elem": {
+        "type": "Object",
+        "value": {
+          "data": {
+            "diskSizeGB": 1
+          },
+          "diskIndex": 1,
+          "name": "myDataDisk2"
+        }
+      },
+      "o2ElemDotData": {
+        "type": "Object",
+        "value": {
+          "diskSizeGB": 1
+        }
+      },
+      "o2ElemDotDataDotDiskSizeGB": {
+        "type": "Int",
+        "value": 1
+      }
+    },
+    "parameters": null,
+    "parametersLink": null,
+    "providers": [],
+    "provisioningState": "Succeeded",
+    "template": null,
+    "templateHash": "11742005433200679954",
+    "templateLink": null,
+    "timestamp": "2019-10-21T02:18:21.138802+00:00"
+  },
+  "type": null
+}

@@ -14,8 +14,8 @@
     ],
     "outputs": {
         "output1": {
-            "type": "bool",
-            "value": true
+            "type": "int",
+            "value": 1234
         }
     }
 }
