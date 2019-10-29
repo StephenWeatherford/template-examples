@@ -1,0 +1,46 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+  },
+  "variables": {
+    "objectVariable": {
+      "copy": [
+        {
+          "name": "array1",
+          "count": 2,
+          "input": {
+            "name": "[concat('array1Value', copyIndex('array1', 1))]",
+            "diskSizeGB": "1",
+            "diskIndex": "[copyIndex('array1')]",
+            "copy": [
+              {
+                "name": "array2",
+                "count": 2,
+                "input": {
+                  "name": "[concat('array2Value', copyIndex('array2', 1))]",
+                  "diskSizeGB": "1",
+                  "diskIndex": "[copyIndex('array2')]"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "array2",
+          "count": 2,
+          "input": "hi"
+        }
+      ],
+      "member2": "member 2"
+    }
+  },
+  "resources": [
+  ],
+  "outputs": {
+    "objectVariable": {
+      "value": "[variables('objectVariable')]",
+      "type": "object"
+    }
+  }
+}
