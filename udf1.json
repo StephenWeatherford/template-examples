@@ -12,7 +12,7 @@
               "type": "string"
             }
           ],
-          "output": {
+          "output": { // <<<<<< NEW SCOPE
             "type": "string",
             "value": "[concat('mystorage', uniqueString(parameters('storageAccountName')))]"
           }
@@ -32,7 +32,7 @@
               "type": "Int"
             }
           ],
-          "output": {
+          "output": { // <<<<<< NEW SCOPE
             "type": "string",
             "value": "[concat(string(parameters('YEAR')), '-', string(parameters('Month')), '-', string(parameters('day')))]"
           }
@@ -56,7 +56,7 @@
               "type": "Int"
             }
           ],
-          "output": {
+          "output": { // <<<<<< NEW SCOPE
             "type": "Bool",
             "value": "[equals(mod(parameters('number'), 2), 0)]"
           }
@@ -64,7 +64,7 @@
         "getSubscriptionId": {
           "parameters": [
           ],
-          "output": {
+          "output": { // <<<<<< NEW SCOPE
             "type": "string",
             "value": "[subscription().subscriptionId]"
           }
@@ -75,7 +75,7 @@
   "Parameters": {
     "p1": {
       "type": "string",
-      "defaultValue": "[udf.storageUri('p1')]"
+      "defaultValue": "[udf.storageUri('p1')]"  // <<<<<< NEW SCOPE (param default value context)
     },
     "p2": {
       "type": "string",
@@ -97,7 +97,7 @@
       "type": "string"
     }
   },
-  "Variables": {
+  "variables": { // <<<<<< NEW SCOPE (variables context)
     "uri": "[udf.storageUri('uri')]",
     "time": "[udf.date(2017, 11, 2)]",
     "condition1": "[udf.odd(3)]",

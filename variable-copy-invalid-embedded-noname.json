@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+  },
+  "variables": {
+    "objectVariable": {
+      "copy": [
+        {
+          "name": "hi",
+          "count": 2,
+          "input": {
+            "name": "name",
+            "diskSizeGB": "1"
+          }
+        },
+        {
+          "count": 2,
+          "input": "hi"
+        }
+      ],
+      "member2": "member 2"
+    }
+  },
+  "resources": [
+  ],
+  "outputs": {
+    "objectVariable": {
+      "value": "[variables('objectVariable')]",
+      "type": "object"
+    }
+  }
+}

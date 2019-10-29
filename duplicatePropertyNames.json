@@ -1,6 +1,4 @@
 {
-    // Surprisingly, this template succeeds (always grabs the second property definition)
-
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
@@ -11,14 +9,32 @@
         "location": {
             "type": "string",
             "defaultValue": "westus"
+        },
+        "caseInsensitiveOutput": { // comment
+            "type": "string",
+            "defaultValue": "caseInsensitiveO
+            utput"
+        },
+        "cas
+        einsensitiveoutput": {
+            "type": "string",
+            "defaultValue": "caseinsensitiveoutput"
+        },
+        "Strasse": {
+            "type": "string",
+            "defaultValue": "Strasse"
+        },
+        "Straße": {
+            "type": "string",
+            "defaultValue": "Straße"
         }
     },
     "variables": {
         "location2": "[parameters('location')]",
-        "location2": "hello there"
+        "location2": "hello there",
+        "Strasse": "[parameters('Strasse')]"
     },
-    "resources": [
-    ],
+    "resources": [],
     "outputs": {
         "output1": {
             "type": "bool",
@@ -32,7 +48,7 @@
             "type": "string",
             "value": "caseInsensitiveOutput"
         },
-        "caseinsensitiveoutput": { // These should still be marked as duplicate properties
+        "caseinsensitiveoutput": {
             "type": "string",
             "value": "caseinsensitiveoutput"
         },
@@ -43,6 +59,14 @@
         "Straße": {
             "type": "string",
             "value": "Straße"
+        },
+        "s1": {
+            "type": "string",
+            "value": "[parameters('Strasse')]"
+        },
+        "s2": {
+            "type": "string",
+            "value": "[parameters('Straße')]"
         }
     }
 }

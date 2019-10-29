@@ -1,0 +1,38 @@
+{
+        "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+        "contentVersion": "1.0.0.0",
+        "variables": {
+            "copy": [
+                {
+                    "name": "disks-top-level-array-of-object",
+                    "count": 5,
+                    "input": {
+                        "name": "[concat('myDataDisk', copyIndex('disks-top-level-array-of-object', 1))]",
+                        "diskIndex": "[copyIndex('disks-top-level-array-of-object')]",
+                        "data": {
+                            "diskSizeGB": 1
+                        }
+                    }
+                }
+            ]
+        },
+        "resources": [],
+        "outputs": {
+            "o1ArrayOfObject": {
+                "value": "[variables('disks-top-level-array-of-object')]",
+                "type": "array"
+            },
+            "o2Elem": {
+                "value": "[variables('disks-top-level-array-of-object')[1]]",
+                "type": "object"
+            },
+            "o2ElemDotData": {
+                "value": "[variables('disks-top-level-array-of-object')[1].data]",
+                "type": "object"
+            },
+            "o2ElemDotDataDotDiskSizeGB": {
+                "value": "[variables('disks-top-level-array-of-object')[1].data.diskSizeGB]",
+                "type": "int"
+            }
+        }
+    }
