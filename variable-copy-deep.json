@@ -1,0 +1,43 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+    },
+    "variables": {
+        "top": {
+            "copy": [
+                {
+                    "name": "array1",
+                    "count": 2,
+                    "input": "[copyIndex('array1')]"
+                }
+            ],
+            "mid": {
+                "copy": [
+                    {
+                        "name": "array2",
+                        "count": 2,
+                        "input": "[copyIndex('array2')]"
+                    }
+                ],
+                "bottom": {
+                    "copy": [
+                        {
+                            "name": "array2",
+                            "count": 2,
+                            "input": "[copyIndex('array2')]"
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "resources": [
+    ],
+    "outputs": {
+        "top": {
+            "type": "object",
+            "value": "[variables('top')]"
+        }
+    }
+}
