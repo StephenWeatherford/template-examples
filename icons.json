@@ -1,0 +1,589 @@
+{
+    // Modified from: https://github.com/azurekid/blog/blob/master/virtualMachine.json
+
+/*
+            Microsoft.Compute/virtualMachines
+            Microsoft.Storage/storageAccounts
+            Microsoft.Network/virtualNetworks
+            Microsoft.Compute/virtualMachines/extensions
+            Microsoft.Network/networkSecurityGroups
+            Microsoft.Network/networkInterfaces
+            Microsoft.Network/publicIPAddresses
+            Microsoft.Web/sites
+            config
+            Microsoft.Insights/components
+            Microsoft.KeyVault/vaults
+            Microsoft.KeyVault/vaults/secrets
+            Microsoft.Cdn/profiles
+*/
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualMachineName": {
+            "type": "string"
+        },
+        "vmCount": {
+            "type": "int",
+            "defaultvalue": 2
+        },
+        "virtualMachineSize": {
+            "type": "string",
+            "defaultValue": "Standard DS2_v3"
+        },
+        "resourceGroupVNet": {
+            "type": "string"
+        },
+        "virtualNetworkName": {
+            "type": "string"
+        },
+        "subnetName": {
+            "type": "string"
+        },
+        "adminUsername": {
+            "type": "string"
+        },
+        "adminPassword": {
+            "type": "securestring"
+        }
+    },
+    "variables": {
+        "vnetId": "[resourceId(parameters('resourceGroupVNet'), 'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+        "location": "West Europe"
+            //"apiVersionVM": "2017-03-30",
+            //"apiVersionNic": "2018-04-01"
+    },
+    "functions": [{
+        "namespace": "myFunctions",
+        "members": {
+            "vmName": {
+                "parameters": [{
+                        "name": "inputNameVM",
+                        "type": "string"
+                    },
+                    {
+                        "name": "indexvm",
+                        "type": "int"
+                    }
+                ],
+                "output": {
+                    "type": "string",
+                    "value": "[concat(toLower(parameters('inputNameVM')), padLeft(parameters('indexvm'),3,'0'))]"
+                }
+            },
+            "diskName": {
+                "parameters": [{
+                        "name": "inputNameDisk",
+                        "type": "string"
+                    },
+                    {
+                        "name": "indexdisk",
+                        "type": "int"
+                    }
+                ],
+                "output": {
+                    "type": "string",
+                    "value": "[concat(toLower(parameters('inputNameDisk')), padLeft(parameters('indexdisk'),3,'0'), '-osdisk')]"
+                }
+            },
+            "nicName": {
+                "parameters": [{
+                        "name": "inputNameNic",
+                        "type": "string"
+                    },
+                    {
+                        "name": "indexnic",
+                        "type": "int"
+                    }
+                ],
+                "output": {
+                    "type": "string",
+                    "value": "[concat(toLower(parameters('inputNameNic')), padLeft(parameters('indexnic'),3,'0'), '-nic')]"
+                }
+            }
+        }
+    }],
+    "resources": [
+        {
+            "name": "config",
+            "type": "config"
+        },
+        {
+            "name": "webApp1",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2016-08-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/appServicePlan1')]": "Resource",
+                "displayName": "webApp1"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft,.Web/serverfarms', 'appServicePlan1')]"
+            ],
+            "properties": {
+                "name": "webApp1",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', 'appServicePlan1')]"
+            }
+        },
+        {
+            "name": "appInsights1-appServicePlan1-AutoScaleSettings",
+            "type": "Microsoft.Insights/autoscalesettings",
+            "apiVersion": "2015-04-01",
+            "location": "East US",
+            "tags": {
+                "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/appServicePlan1')]": "Resource",
+                "displayName": "appInsights1 AutoScale Settings for appServicePlan1"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', 'appServicePlan1')]"
+            ],
+            "properties": {
+                "name": "appInsights1-appServicePlan1-AutoScaleSettings",
+                "profiles": [
+                    {
+                        "name": "Default",
+                        "capacity": {
+                            "minimum": 1,
+                            "maximum": 2,
+                            "default": 1
+                        },
+                        "rules": [
+                            {
+                                "metricTrigger": {
+                                    "metricName": "CpuPercentage",
+                                    "metricResourceUri": "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/appServicePlan1')]",
+                                    "timeGrain": "PT1M",
+                                    "statistic": "Average",
+                                    "timeWindow": "PT10M",
+                                    "timeAggregation": "Average",
+                                    "operator": "GreaterThan",
+                                    "threshold": 80.0
+                                },
+                                "scaleAction": {
+                                    "direction": "Increase",
+                                    "type": "ChangeCount",
+                                    "value": 1,
+                                    "cooldown": "PT10M"
+                                }
+                            },
+                            {
+                                "metricTrigger": {
+                                    "metricName": "CpuPercentage",
+                                    "metricResourceUri": "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/appServicePlan1')]",
+                                    "timeGrain": "PT1M",
+                                    "statistic": "Average",
+                                    "timeWindow": "PT1H",
+                                    "timeAggregation": "Average",
+                                    "operator": "LessThan",
+                                    "threshold": 60.0
+                                },
+                                "scaleAction": {
+                                    "direction": "Decrease",
+                                    "type": "ChangeCount",
+                                    "value": 1,
+                                    "cooldown": "PT1H"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "enabled": false,
+                "targetResourceUri": "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/appServicePlan1')]"
+            }
+        },
+        {
+            "name": "appInsights1-CPUHigh-appServicePlan1",
+            "type": "Microsoft.Insights/alertrules",
+            "apiVersion": "2016-03-01",
+            "location": "East US",
+            "tags": {
+                "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/appServicePlan1')]": "Resource",
+                "displayName": "appInsights1 CPUHigh rule for appServicePlan1"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', 'appServicePlan1')]"
+            ],
+            "properties": {
+                "name": "appInsights1-CPUHigh-appServicePlan1",
+                "description": "The average CPU is high across all the instances of appServicePlan1",
+                "isEnabled": false,
+                "condition": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.ThresholdRuleCondition",
+                    "dataSource": {
+                        "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+                        "resourceUri": "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/appServicePlan1')]",
+                        "metricName": "CpuPercentage"
+                    },
+                    "operator": "GreaterThan",
+                    "threshold": 90,
+                    "windowSize": "PT15M"
+                },
+                "action": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+                    "sendToServiceOwners": true,
+                    "customEmails": []
+                }
+            }
+        },
+        {
+            "name": "appInsights1-LongHttpQueue-appServicePlan1",
+            "type": "Microsoft.Insights/alertrules",
+            "apiVersion": "2016-03-01",
+            "location": "East US",
+            "tags": {
+                "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/appServicePlan1')]": "Resource",
+                "displayName": "appInsights1 LongHttpQueue rule for appServicePlan1"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', 'appServicePlan1')]"
+            ],
+            "properties": {
+                "name": "appInsights1-LongHttpQueue-appServicePlan1",
+                "description": "The HTTP queue for the instances of appServicePlan1 has a large number of pending requests.",
+                "isEnabled": false,
+                "condition": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.ThresholdRuleCondition",
+                    "dataSource": {
+                        "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+                        "resourceUri": "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/appServicePlan1')]",
+                        "metricName": "HttpQueueLength"
+                    },
+                    "operator": "GreaterThan",
+                    "threshold": 100.0,
+                    "windowSize": "PT5M"
+                },
+                "action": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+                    "sendToServiceOwners": true,
+                    "customEmails": []
+                }
+            }
+        },
+        {
+            "name": "appInsights1-ServerErrors-webApp1",
+            "type": "Microsoft.Insights/alertrules",
+            "apiVersion": "2016-03-01",
+            "location": "East US",
+            "tags": {
+                "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/webApp1')]": "Resource",
+                "displayName": "appInsights1 ServerErrors rule for webApp1"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', 'webApp1')]"
+            ],
+            "properties": {
+                "name": "appInsights1-ServerErrors-webApp1",
+                "description": "webApp1 has some server errors, status code 5xx.",
+                "isEnabled": false,
+                "condition": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.ThresholdRuleCondition",
+                    "dataSource": {
+                        "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+                        "resourceUri": "[concat(resourceGroup().id, '/providers/Microsoft.Web/sites/webApp1')]",
+                        "metricName": "Http5xx"
+                    },
+                    "operator": "GreaterThan",
+                    "threshold": 0.0,
+                    "windowSize": "PT5M"
+                },
+                "action": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+                    "sendToServiceOwners": true,
+                    "customEmails": []
+                }
+            }
+        },
+        {
+            "name": "appInsights1-ForbiddenRequests-webApp1",
+            "type": "Microsoft.Insights/alertrules",
+            "apiVersion": "2016-03-01",
+            "location": "East US",
+            "tags": {
+                "displayName": "appInsights1 ForbiddenRequests rule for webApp1"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', 'webApp1')]"
+            ],
+            "properties": {
+                "name": "appInsights1-ForbiddenRequests-webApp1",
+                "description": "webApp1 has some requests that are forbidden, status code 403.",
+                "isEnabled": false,
+                "condition": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.ThresholdRuleCondition",
+                    "dataSource": {
+                        "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+                        "resourceUri": "[concat(resourceGroup().id, '/providers/Microsoft.Web/sites/webApp1')]",
+                        "metricName": "Http403"
+                    },
+                    "operator": "GreaterThan",
+                    "threshold": 0,
+                    "windowSize": "PT5M"
+                },
+                "action": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+                    "sendToServiceOwners": true,
+                    "customEmails": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "apiVersion": "2018-02-14",
+            "name": "keyVault1",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "keyVault1"
+            },
+            "properties": {
+                "enabledForDeployment": true,
+                "enabledForTemplateDeployment": true,
+                "enabledForDiskEncryption": true,
+                "tenantId": "tenantId",
+                "accessPolicies": [
+                    {
+                        "tenantId": "tenantId",
+                        "objectId": "objectId",
+                        "permissions": {
+                            "keys": [
+                                "Get" 
+                             ],
+                            "secrets": [
+                                "List",
+                                "Get",
+                                "Set"
+                            ]
+                       }
+                    }
+                ],
+                "sku": {
+                    "name": "standard",
+                    "family": "A"
+                }
+            },
+            "resources": [
+                {
+                    "type": "secrets",
+                    "name": "keyVaultSecret1",
+                    "apiVersion": "2016-10-01",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.KeyVault/vaults', 'keyVault1')]"
+                    ],
+                    "properties": {
+                        "value": "secretValue"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Cdn/profiles"
+        },
+        {
+            "name": "appInsights1",
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2015-05-01",
+            "location": "Central US",
+            "tags": {
+                "displayName": "appInsights1 Component for webApp1"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', 'webApp1')]"
+            ],
+            "properties": {
+                "applicationId": "webApp1",
+                "application_Type": "web"
+            }
+        },
+        {
+            "name": "virtualNetwork1",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2018-08-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "virtualNetwork1"
+            },
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.0.0.0/16"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "Subnet-1",
+                        "properties": {
+                            "addressPrefix": "10.0.0.0/24"
+                        }
+                    },
+                    {
+                        "name": "Subnet-2",
+                        "properties": {
+                            "addressPrefix": "10.0.1.0/24"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "windowsVM1/dscScript1",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2018-06-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "windowsVM1/dscScript1"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', 'windowsVM1')]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Powershell",
+                "type": "DSC",
+                "typeHandlerVersion": "2.9",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "modulesUrl": "[concat('artifactsLocation', '/DSCModules/dsc.zip')]",
+                    "sasToken": "artifactsLocationSasToken",
+                    "configurationFunction": "Configure",
+                    "properties": {
+                        "nodeName": "windowsVM1"
+                    }
+                },
+                "protectedSettings": {}
+            }
+        },
+        {
+            "name": "applicationSecurityGroup1",
+            "type": "Microsoft.Network/applicationSecurityGroups",
+            "apiVersion": "2018-08-01",
+            "location": "[resourceGroup().location]",
+            "tags": {},
+            "properties": {}
+        },
+        {
+            "name": "networkSecurityGroup1",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2018-08-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "nsgRule1",
+                        "properties": {
+                            "description": "description",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "publicIPAddress1",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2018-08-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "publicIPAddress1"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "dnsSettings": {
+                    "domainNameLabel": "dnsname1"
+                }
+            }
+        },
+        {
+            "name": "storageaccount1",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2015-06-15",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "storageaccount1"
+            },
+            "properties": {
+                "accountType": "Standard_LRS"
+            }
+        },
+        {
+            "name": "[myFunctions.vmName(parameters('virtualMachineName'),copyindex(1))]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2017-03-30",
+            "location": "[variables('location')]",
+            "copy": {
+                "name": "virtualMachineLoop",
+                "count": "[parameters('vmCount')]"
+            },
+            "dependsOn": [
+                "[myFunctions.nicName(parameters('virtualMachineName'),copyindex(1))]"
+            ],
+            "properties": {
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachineName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "windowsConfiguration": {
+                        "provisionVmAgent": true
+                    }
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('virtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2016-Datacenter",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "[myFunctions.diskName(parameters('virtualMachineName'),copyindex(1))]",
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "Premium_LRS"
+                        }
+                    },
+                    "dataDisks": []
+                },
+                "networkProfile": {
+                    "networkInterfaces": [{
+                        "id": "[resourceId('Microsoft.Network/networkInterfaces', myFunctions.nicName(parameters('virtualMachineName'),copyindex(1)))]"
+                    }]
+                },
+                "licenseType": "Windows_Server"
+            }
+        },
+        {
+            "name": "[myFunctions.nicName(parameters('virtualMachineName'),copyindex(1))]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2018-04-01",
+            "location": "[variables('location')]",
+            "copy": {
+                "name": "NicLoop",
+                "count": "[parameters('vmCount')]"
+            },
+            "dependsOn": [],
+            "properties": {
+                "ipConfigurations": [{
+                    "name": "ipconfig1",
+                    "properties": {
+                        "subnet": {
+                            "id": "[variables('subnetRef')]"
+                        },
+                        "privateIPAllocationMethod": "Dynamic"
+                    }
+                }]
+            }
+        }
+    ],
+    "outputs": {
+        "adminUsername": {
+            "type": "string",
+            "value": "[parameters('adminUsername')]"
+        }
+    }
+}
