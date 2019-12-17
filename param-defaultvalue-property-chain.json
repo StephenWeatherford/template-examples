@@ -1,0 +1,26 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "resources": [],
+    "parameters": {
+        "p1":{
+            "type": "object",
+            "defaultValue": {
+                "a": {
+                    "b": {
+                        "c": {
+                            "d": 1
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "outputs": 
+    {
+        "o1": {
+            "type": "int",
+            "value": "[parameters('p1').a.b.c.d]"
+        }
+    }
+}
