@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "rgName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the resourceGroup to create"
+            }
+        },
+        "rgLocation": {
+            "type": "string",
+            "defaultValue": "southcentralus",
+            "metadata": {
+                "description": "Location for the resourceGroup"
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2018-05-01",
+            "location": "[parameters('rgLocation')]",
+            // Schema has a regex validation and a maxLength validation, which we should ignore since it's an expression
+            "name": "[concat(parameters('rgName'),uniqueString('some-very-long-expression','and-another-long-expression','plus another one'))]",
+            "tags": {
+                "Note": "subscription level deployment"
+            },
+            "properties": {}
+        }
+    ]
+}
