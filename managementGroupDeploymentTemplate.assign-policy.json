@@ -1,0 +1,31 @@
+{
+    // from https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/deploy-to-management-group
+    "$schema": "https://schema.management.azure.com/schemas/2019-08-01/managementGroupDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "policyDefinitionID": {
+            "type": "string"
+        },
+        "policyName": {
+            "type": "string"
+        },
+        "policyParameters": {
+            "type": "object",
+            "defaultValue": {
+            }
+        }
+    },
+    "variables": {
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Authorization/policyAssignments",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('policyName')]",
+            "properties": {
+                "policyDefinitionId": "[parameters('policyDefinitionID')]",
+                "parameters": "[parameters('policyParameters')]"
+            }
+        }
+    ]
+}
