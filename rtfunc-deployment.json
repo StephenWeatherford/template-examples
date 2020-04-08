@@ -1,0 +1,25 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "resources": [
+    ],
+    "variables": {
+        // From https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-deployment#deployment
+        "sharedTemplateUrl": "[uri(deployment().properties.templateLink.uri, 'shared-resources.json')]"
+    },
+    "parameters": {
+        "p1": {
+            "type": "string"
+        }
+    },
+    "outputs": {
+        "o1": {
+            "type": "int",
+            "value": "[variables('sharedTemplateUrl')]"
+        },
+        "p1": {
+            "type": "string",
+            "value": "[parameters('p1')]"
+        }
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            // Function 'resourceGroup' is only valid for resource group deployments
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        }
+    },
+    "resources": [
+    ],
+    "outputs": {
+        "o1": {
+            "type": "string",
+            "value": "[parameters('location')]"
+        }
+    }
+}
