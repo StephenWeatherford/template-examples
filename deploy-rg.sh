@@ -1,2 +1,6 @@
 # Deploy to resource group
-az group deployment create -g deleteme --handle-extended-json-format --template-file $1 --parameters $2
+if $2; then
+    az group deployment create -g deleteme --handle-extended-json-format --template-file $1
+else
+    az group deployment create -g deleteme --handle-extended-json-format --template-file $1 --parameters $2
+fi
