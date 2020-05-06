@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "rgNamePrefix": {
+            "value": "LOB1-WORKLOAD1"
+        },
+        "rgEnvList": {
+            "value": [
+                "DEV",
+                "PROD"
+            ]
+        },
+        "rgLocation": {
+            "value": "centralus"
+        },
+        "instanceCount": {
+            "value": 2
+        }
+    }
+}
