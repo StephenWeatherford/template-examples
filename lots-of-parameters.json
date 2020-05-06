@@ -1,0 +1,92 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "requiredInt": {
+            "type": "int"
+        },
+        "optionalInt": {
+            "type": "int",
+            "defaultValue": 123
+        },
+
+        "requiredString": {
+            "type": "string"
+        },
+        "optionalString": {
+            "type": "string",
+            "defaultValue": "abc"
+        },
+        "optionalString2": {
+            "type": "string",
+            "defaultValue": "[parameters('optionalString')]"
+        },
+
+        "requiredSecureString": {
+            "type": "securestring"
+        },
+        "optionalSecureString": {
+            "type": "securestring",
+            "defaultValue": "abc"
+        },
+
+        "requiredBool": {
+            "type": "bool"
+        },
+        "optionalBool": {
+            "type": "bool",
+            "defaultValue": true
+        },
+
+        "requiredArray": {
+            "type": "array"
+        },
+        "optionalArray": {
+            "type": "array",
+            "defaultValue": [
+                true
+            ]
+        },
+
+        "requiredObject": {
+            "type": "object"
+        },
+        "optionalObject": {
+            "type": "object",
+            "defaultValue": {
+                "value1": true
+            }
+        },
+
+        "requiredSecureObject": {
+            "type": "secureObject"
+        },
+        "optionalSecureObject": {
+            "type": "secureObject",
+            "defaultValue": {
+                "value1": true
+            }
+        }
+
+    },
+    "functions": [
+    ],
+    "variables": {
+    },
+    "resources": [
+    ],
+    "outputs": {
+        "output1": {
+            "type": "array",
+            "value": [
+                "[add(parameters('optionalInt'),parameters('requiredInt'))]",
+                "[concat(parameters('optionalString'),parameters('optionalString2'),parameters('requiredString'))]",
+                "[concat(parameters('optionalBool'),parameters('requiredBool'))]",
+                "[concat(parameters('optionalArray'),parameters('requiredArray'))]",
+                "[concat(parameters('optionalObject'),parameters('requiredObject'))]",
+                "[concat(parameters('optionalSecureObject'),parameters('requiredSecureObject'))]",
+                "[concat(parameters('optionalSecureString'),parameters('requiredSecureString'))]"
+            ]
+        }
+    }
+}
