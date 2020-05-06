@@ -4,6 +4,9 @@
     "resources": [
     ],
     "parameters": {
+        "p2": {
+            "type": "securestring"
+        },
         "administratorLoginPassword": {
             "type": "securestring",
             "metadata": {

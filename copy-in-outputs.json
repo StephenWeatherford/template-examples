@@ -3,8 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "count": {
-            "type": "int",
-            "defaultValue": 3
+            "type": "int"
         }
     },
     "variables": {
