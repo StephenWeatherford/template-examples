@@ -54,7 +54,7 @@
         "optionalObject": {
             "type": "object",
             "defaultValue": {
-                "value1": true
+                "myTrueProp": true
             }
         },
 
