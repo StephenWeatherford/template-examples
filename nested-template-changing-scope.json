@@ -1,0 +1,56 @@
+{
+    // hello
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+    },
+    "variables": {
+        "exampleVar": "from parent template"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "nestedTemplate1",
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "inner" // <<< CHANGE BETWEEN INNER AND OUTER
+                },
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "variables": {
+                        "exampleVar": "from nested template"
+                    },
+                    "resources": [
+                    ],
+                    "outputs": {
+                        "testVar": {
+                            "type": "string",
+                            "value": "[variables('exampleVar')]"
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+        /* Output for 'inner':
+            "messageFromLinkedTemplate": {
+                "type": "String",
+                "value": "from nested template"
+            }
+        */
+        /* Output for 'outer' or default:
+            "messageFromLinkedTemplate": {
+                "type": "String",
+                "value": "from parent template"
+            }        
+        */
+        "messageFromLinkedTemplate": {
+            "type": "string",
+            "value": "[reference('nestedTemplate1').outputs.testVar.value]"
+        }
+    }
+}

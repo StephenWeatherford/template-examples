@@ -83,18 +83,22 @@
     "outputs": {
         "parentRG": {
             "type": "string",
+            // "value": "Parent resource group is deleteme"
             "value": "[concat('Parent resource group is ', resourceGroup().name)]"
         },
         "defaultScopeRG": {
             "type": "string",
+            // "value": "Default scope resource group is deleteme"
             "value": "[concat('Default scope resource group is ', reference('defaultScopeTemplate').outputs.resourceGroupOutput.value)]"
         },
         "innerScopeRG": {
             "type": "string",
+            // "value": "Inner scope resource group is inlineGroup"
             "value": "[concat('Inner scope resource group is ', reference('innerScopeTemplate').outputs.resourceGroupOutput.value)]"
         },
         "linkedRG": {
             "type": "string",
+            // "value": "Linked resource group is linkedGroup"
             "value": "[concat('Linked resource group is ', reference('linkedTemplate').outputs.resourceGroupOutput.value)]"
         }
     }

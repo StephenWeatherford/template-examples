@@ -1,0 +1,118 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+    },
+    "variables": {
+        "v1": "v1 from parent",
+        "v2": "v2 from parent"
+    },
+    "resources": [
+        // ONE - inner scope chooses root-level variable when it exists in root and nested deployment
+
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "inner1",
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "inner"
+                },
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "variables": {
+                        "v1": "v1 from inner1"
+                    },
+                    "resources": [
+                    ],
+                    "outputs": {
+                        "v1": {
+                            "type": "string",
+                            "value": "[variables('v1')]"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "outer1",
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "outer"
+                },
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "variables": {
+                        "v1": "v1 from outer1"
+                    },
+                    "resources": [
+                    ],
+                    "outputs": {
+                        "v1": {
+                            "type": "string",
+                            "value": "[variables('v1')]"
+                        }
+                    }
+                }
+            }
+        },
+
+        // TWO inner-scoped nested template can't access root-level variables
+        /* GIVES ERROR
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "inner2",
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "inner"
+                },
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "variables": {
+                        "v1": "v1 from inner1"
+                    },
+                    "resources": [
+                    ],
+                    "outputs": {
+                        "v1": {
+                            "type": "string",
+                            "value": "[variables('v2')]"
+                        }
+                    }
+                }
+            }
+        }*/
+    ],
+    "outputs": {
+        /*
+      "inner1-v1": {
+        "type": "String",
+        "value": "v1 from inner1"
+      },
+      "outer1-v1": {
+        "type": "String",
+        "value": "v1 from parent"
+      }
+    },  
+*/
+        "inner1-v1": {
+            "type": "string",
+            // expected: "v1 from inner1"
+            "value": "[reference('inner1').outputs.v1.value]"
+        },
+        "outer1-v1": {
+            "type": "string",
+            // expected: "v1 from parent"
+            "value": "[reference('outer1').outputs.v1.value]"
+        }
+    }
+}
