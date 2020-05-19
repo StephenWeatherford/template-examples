@@ -1,0 +1,99 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.2.3.4",
+    "resources": [
+        {
+            // scope = inner
+            "type": "Microsoft.Resources/deployments",
+            "name": "nested",
+            "apiVersion": "2017-05-10",
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "inner"
+                },
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                    ],
+                    "outputs": {
+                        "nestedOutput": {
+                            "type": "string",
+                            "value": "[inner.func1('from nested')]"
+                        }
+                    },
+                    "functions": [
+                        {
+                            "namespace": "inner",
+                            "members": {
+                                "func1": {
+                                    "parameters": [
+                                        {
+                                            "name": "innerp1",
+                                            "type": "string"
+                                        }
+                                    ],
+                                    "output": {
+                                        "type": "string",
+                                        "value": "[parameters('innerp1')]" // References inner func1's p1
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            // scope = outer
+            "type": "Microsoft.Resources/deployments",
+            "name": "nested",
+            "apiVersion": "2017-05-10",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                    ],
+                    "outputs": {
+                        "nestedOutput1": {
+                            "type": "string",
+                            "value": "[root.func1('from nested')]"
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "o1": {
+            "type": "string",
+            "value": "[reference('nested').outputs.nestedOutput.value]"
+        },
+        "o2": {
+            "type": "string",
+            "value": "[root.func1('from root')]"
+        }
+    },
+    "functions": [
+        {
+            "namespace": "root",
+            "members": {
+                "func1": {
+                    "parameters": [
+                        {
+                            "name": "rootp1",
+                            "type": "string"
+                        }
+                    ],
+                    "output": {
+                        "type": "string",
+                        "value": "[parameters('rootp1')]"
+                    }
+                }
+            }
+        }
+    ]
+}
