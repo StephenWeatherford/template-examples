@@ -5,7 +5,7 @@
         {
             // scope = inner
             "type": "Microsoft.Resources/deployments",
-            "name": "inner",
+            "name": "inner1",
             "apiVersion": "2017-05-10",
             "properties": {
                 "expressionEvaluationOptions": {
@@ -19,7 +19,7 @@
                         {
                             // scope = inner
                             "type": "Microsoft.Resources/deployments",
-                            "name": "inner",
+                            "name": "inner2",
                             "apiVersion": "2017-05-10",
                             "properties": {
                                 "expressionEvaluationOptions": {
@@ -30,27 +30,48 @@
                                     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
                                     "contentVersion": "1.0.0.0",
                                     "resources": [
+                                        {
+                                            // scope = outer (which is inner2)
+                                            "type": "Microsoft.Resources/deployments",
+                                            "name": "outer3",
+                                            "apiVersion": "2017-05-10",
+                                            "properties": {
+                                                "mode": "Incremental",
+                                                "template": {
+                                                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                                                    "contentVersion": "1.0.0.0",
+                                                    "resources": [
+                                                    ],
+                                                    "outputs": {
+                                                        "nestedOutput": {
+                                                            "type": "string",
+                                                            "value": "[inner2.func1('root.func1 from outer')]"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
                                     ],
                                     "outputs": {
                                         "nestedOutput": {
                                             "type": "string",
-                                            "value": "[inner.func1('from inner.func1')]"
+                                            "value": "[inner2.func1('from inner.func1')]"
                                         }
                                     },
                                     "functions": [
                                         {
-                                            "namespace": "inner",
+                                            "namespace": "inner2",
                                             "members": {
                                                 "func1": {
                                                     "parameters": [
                                                         {
-                                                            "name": "innerp1",
+                                                            "name": "innerp2",
                                                             "type": "string"
                                                         }
                                                     ],
                                                     "output": {
                                                         "type": "string",
-                                                        "value": "[parameters('innerp1')]" // References inner func1's p1
+                                                        "value": "[parameters('innerp2')]"
                                                     }
                                                 }
                                             }
@@ -63,12 +84,12 @@
                     "outputs": {
                         "nestedOutput": {
                             "type": "string",
-                            "value": "[inner.func1('from inner.func1')]"
+                            "value": "[inner1.func1('from inner.func1')]"
                         }
                     },
                     "functions": [
                         {
-                            "namespace": "inner",
+                            "namespace": "inner1",
                             "members": {
                                 "func1": {
                                     "parameters": [
@@ -79,7 +100,7 @@
                                     ],
                                     "output": {
                                         "type": "string",
-                                        "value": "[parameters('innerp1')]" // References inner func1's p1
+                                        "value": "[parameters('innerp1')]"
                                     }
                                 }
                             }
@@ -112,26 +133,26 @@
     ],
     "outputs": {
         /*
-
+        
     "outputs": {
-      "o2": {
-        "type": "String",
-        "value": "from root"
-      },
-      "oInner": {
+      "oInner1": {
         "type": "String",
         "value": "from inner.func1"
       },
       "oOuter": {
         "type": "String",
         "value": "root.func1 from outer"
+      },
+      "oRoot": {
+        "type": "String",
+        "value": "from root"
       }
-    },
+    }
 
         */
-        "oInner": {
+        "oInner1": {
             "type": "string",
-            "value": "[reference('inner').outputs.nestedOutput.value]"
+            "value": "[reference('inner1').outputs.nestedOutput.value]"
         },
         "oOuter": {
             "type": "string",

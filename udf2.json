@@ -1,9 +1,9 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "functions": [
         {
-            "namespace": "udf",
+            "namespace": "udf2",
             "members": {
                 "date": {
                     "parameters": [
@@ -12,7 +12,7 @@
                             "type": "Int"
                         },
                         {
-                            "name": "month",
+                            "name": "month2",
                             "type": "Int"
                         },
                         {
@@ -22,7 +22,7 @@
                     ],
                     "output": {
                         "type": "string",
-                        "value": "[concat(string(parameters('year')), '-', string(parameters('month')), '-', string(parameters('day')))]"
+                        "value": "[concat(string(parameters('year')), '-', string(parameters('month2')), '-', string(parameters('day')))]"
                     }
                 }
             }
@@ -47,7 +47,7 @@
         }
     },
     "variables": {
-        "var1": {
+        "var2b": {
             "a": {
                 "b": {
                     "c": 16180339887498948482
@@ -55,16 +55,16 @@
                 "d": 42
             }
         },
-        "var2": "[variables('var1')]"
+        "var2b": "[variables('var2b')]"
     },
     "outputs": {
         "output1": {
             "type": "int",
-            "value": "[variables('var1')]"
+            "value": "[variables('var2b')]"
         },
         "output2": {
             "type": "string",
-            "value": "[udf.date(2019, 10, 5)]"
+            "value": "[udf2.date(2019, 10, 5)]"
         }
     }
 }

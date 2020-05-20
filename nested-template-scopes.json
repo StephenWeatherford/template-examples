@@ -61,7 +61,7 @@
                     }
                 }
             }
-        },
+        }
 
         // TWO inner-scoped nested template can't access root-level variables
         /* GIVES ERROR
