@@ -1,0 +1,60 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "a"
+        },
+        "vaultName": {
+            "value": "b"
+        },
+        "secretName": {
+            "value": "c"
+        },
+        "vaultResourceGroupName": {
+            "value": "d"
+        },
+        "vaultSubscription": {
+            "value": "e"
+        },
+        "adminUsername": {
+            "value": "f"
+        },
+        "virtualNetworksName": {
+            "value": "g"
+        },
+        "subnetName": {
+            "value": "a"
+        },
+        "storageAccountsName": {
+            "value": "b"
+        },
+        "galleriesExternalId": {
+            "value": "c"
+        },
+        "galleryImageDefinitionName": {
+            "value": "d"
+        },
+        "virtualMachinesName": {
+            "value": "e"
+        },
+        "virtualMachinesSize": {
+            "value": "Standard_B2s"
+        },
+        "vmCount": {
+            "value": 1
+        },
+        "dataDiskArray": {
+            "value": [
+                {
+                    "name": "datadisk1",
+                    "lun": 0,
+                    "createOption": "Empty",
+                    "caching": "None",
+                    "diskSizeGB": 1,
+                    "storageAccountType": "Standard_LRS"
+                }
+            ]
+        }
+    }
+}

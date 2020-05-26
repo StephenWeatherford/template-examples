@@ -1,0 +1,142 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string"
+        },
+        "virtualNetworksName": {
+            "type": "String"
+        },
+        "subnetName": {
+            "type": "string"
+        },
+        "storageAccountsName": {
+            "type": "String"
+        },
+        "galleriesExternalId": {
+            "type": "String"
+        },
+        "galleryImageDefinitionName": {
+            "type": "string"
+        },
+        "adminUsername": {
+            "type": "string"
+        },
+        "adminPassword": {
+            "type": "securestring"
+        },
+        "virtualMachinesName": {
+            "type": "String"
+        },
+        "virtualMachinesSize": {
+            "type": "string"
+        },
+        "dataDiskArray": {
+            "type": "array"
+        }
+    },
+    "variables": {
+        "subnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworksName'), parameters('subnetName'))]",
+        "imageId": "[concat(parameters('galleriesExternalId'), '/images/',parameters('galleryImageDefinitionName'))]",
+        "copy": [
+            {
+                "name": "dataDisks",
+                "count": "[if(equals(length(parameters('dataDiskArray')),0),1, length(parameters('dataDiskArray')))]",
+                "input": {
+                    "name": "[concat(parameters('virtualMachinesName'),'_DataDisk',copyIndex('dataDisks',1))]",
+                    "lun": "[if(equals(length(parameters('dataDiskArray')),0),0, copyIndex('dataDisks'))]",
+                    "createOption": "Empty",
+                    "diskSizeGB": "[if(equals(length(parameters('dataDiskArray')),0),4,parameters('dataDiskArray')[copyIndex('dataDisks')].diskSizeGB)]",
+                    "caching": "[if(equals(length(parameters('dataDiskArray')),0),'none',parameters('dataDiskArray')[copyIndex('dataDisks')].caching)]",
+                    "managedDisk": {
+                        "storageAccountType": "[if(equals(length(parameters('dataDiskArray')),0),'Standard_LRS',parameters('dataDiskArray')[copyIndex('dataDisks')].storageAccountType)]"
+                    }
+                }
+            }
+        ]
+    },
+    "resources": [
+        // Linux server and related resources
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-12-01",
+            "name": "[concat(parameters('virtualMachinesName'),'_NIC1')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnetId')]"
+                            },
+                            "primary": true,
+                            "privateIPAddressVersion": "IPv4"
+                        }
+                    }
+                ],
+                "dnsSettings": {
+                    "dnsServers": [
+                    ]
+                },
+                "enableAcceleratedNetworking": false,
+                "enableIPForwarding": false
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-07-01",
+            "name": "[parameters('virtualMachinesName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('virtualMachinesName'),'_NIC1'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('virtualMachinesSize')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "id": "[variables('imageId')]"
+                    },
+                    "osDisk": {
+                        "osType": "Linux",
+                        "name": "[concat(parameters('virtualMachinesName'), '_OsDisk')]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "StorageAccountType": "Standard_LRS"
+                        }
+                    },
+                    "dataDisks": "[if(equals(length(parameters('dataDiskArray')),0),json('null'),variables('dataDisks'))]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachinesName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": false,
+                        "provisionVMAgent": true
+                    },
+                    "secrets": [
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('virtualMachinesName'),'_NIC1'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[concat('https://', parameters('storageAccountsName'), '.blob.core.windows.net/')]"
+                    }
+                }
+            }
+        }
+    ]
+}
