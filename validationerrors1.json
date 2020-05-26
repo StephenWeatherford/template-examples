@@ -1,0 +1,22 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "p1": {
+        },
+        "p2": {
+        }
+    },
+    "functions": [
+    ],
+    "variables": {
+    },
+    "resources": [
+    ],
+    "outputs": {
+        "o1": {
+            "type": "string",
+            "value": "[concat(parameters('p1'),parameters('p2'))]"
+        }
+    }
+}
