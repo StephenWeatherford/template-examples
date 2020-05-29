@@ -14,9 +14,6 @@
         "vaultResourceGroupName": {
             "value": "d"
         },
-        "vaultSubscription": {
-            "value": "e"
-        },
         "adminUsername": {
             "value": "f"
         },

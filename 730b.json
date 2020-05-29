@@ -6,7 +6,8 @@
             "type": "string"
         },
         "virtualNetworksName": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "abc"
         },
         "subnetName": {
             "type": "string"
