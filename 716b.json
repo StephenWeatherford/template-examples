@@ -1,0 +1,67 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "outerParam": {
+            "type": "string",
+            "defaultValue": "paramFromOuter"
+        }
+    },
+    "variables": {
+        "outerVariable": "varFromOuter"
+    },
+    "resources": [
+        {
+            "name": "nestedTemplate1",
+            "apiVersion": "2019-10-01",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "inner"
+                },
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "paramFromOuter": {
+                            "type": "string"
+                        },
+                        "variableFromOuter": {
+                            "type": "string"
+                        }
+                    },
+                    "variables": {
+                        "innerVariable": "varFromInner"
+                    },
+                    "resources": [
+                    ],
+                    "outputs": {
+                        "paramFromOuter": {
+                            "type": "string",
+                            "value": "[parameters('paramFromOuter')]"
+                        },
+                        "variableFromOuter": {
+                            "type": "string",
+                            "value": "[parameters('variableFromOuter')]"
+                        },
+                        "variableFromInner": {
+                            "type": "string",
+                            "value": "[variables('innerVariable')]"
+                        }
+                    }
+                },
+                "parameters": {
+                    "paramFromOuter": {
+                        "value": "[parameters('outerParam')]"
+                    },
+                    "variableFromOuter": {
+                        "value": "[variables('outerVariable')]"
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+    }
+}

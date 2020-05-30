@@ -5,7 +5,7 @@
         "location": {
             "value": "a"
         },
-        "virtualNetworksName2": {
+        "virtualNetworksName": {
             "value": "b"
         },
         "subnetName": {
