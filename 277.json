@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "baseParameters": {
+      "defaultValue": {
+        "tagValues": [
+          "tag1"
+        ]
+      },
+      "type": "object"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "name": "hello",
+      "apiVersion": "2018-05-01",
+      "location": "westus",
+      "properties": {
+      },
+      "tags": "[parameters('baseParameters').tagValues]"
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "name": "name",
+      "apiVersion": "2018-05-01",
+      "properties": {
+        "mode": "Complete"
+      }
+    }
+  ]
+}

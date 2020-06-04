@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "resources": [
+        {
+            "name": "nestedDeployment1",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "verydeep.json",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "linked1output1": {
+            "type": "string",
+            "value": "[concat('My parameter is ', parameters('linked1param1'))]"
+        }
+    },
+    "functions": [
+    ],
+    "parameters": {
+        "linked1param1": {
+            "type": "int"
+        }
+    }
+}

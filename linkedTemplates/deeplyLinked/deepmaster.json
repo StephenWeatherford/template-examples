@@ -1,0 +1,31 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "linkedTemplatesLocation": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "firstTemplate": "deep.json"
+    },
+    "resources": [
+        {
+            "name": "nestedDeployment",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(parameters('linkedTemplatesLocation'), '/', variables('firstTemplate'))]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "linked1param1": {
+                        "value": 6
+                    }
+                }
+            }
+        }
+    ]
+}
