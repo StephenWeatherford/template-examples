@@ -3,7 +3,8 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "linkedTemplatesLocation": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "https://github.com/StephenWeatherford/template-examples/tree/master/linkedTemplates/twoLinked/templates"
         }
     },
     "variables": {
@@ -11,7 +12,6 @@
         "secondTemplate": "linkedTemplate2.json"
     },
     "resources": [
-        // hello
         {
             "name": "nestedDeployment2",
             "type": "Microsoft.Resources/deployments",
@@ -40,7 +40,7 @@
                 },
                 "parameters": {
                     "linked1param1": {
-                        "value": "my value" // (error)
+                        "value": "my value"
                     }
                 }
             }
