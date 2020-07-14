@@ -13,12 +13,13 @@
       "location": "westeurope",
       "name": "[variables('resourceGroupName')]"
     },
+    
     /*
     // Add delete lock to production resource groups
     */
     {
       "name": "Test",
-      "apiVersion": "2018-05-01",
+      "apiVersion": "2018-05-02",
       "type": "Microsoft.Resources/deployments",
       "resourceGroup": "[variables('resourceGroupName')]",
       "dependsOn": [
