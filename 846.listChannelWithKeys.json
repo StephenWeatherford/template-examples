@@ -1,0 +1,21 @@
+{
+    // https://github.com/MicrosoftDocs/azure-docs/issues/34829
+    // https://github.com/Azure/azure-rest-api-specs/blob/master/specification/botservice/resource-manager/Microsoft.BotService/preview/2018-07-12/botservice.json
+
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "functions": [],
+    "variables": {},
+    "resources": [],
+    "outputs": {
+        "directLineSecret": {
+            "value": "[listChannelWithKeys('/subscriptions/{sub-id}/resourceGroups/{rg}/providers/Microsoft.BotService/botServices/{bot}/channels/DirectLineChannel', '2018-07-12').properties.properties.sites[0].key]",
+            "type": "string"
+        },
+        "directLineSecret2": {
+            "type": "string",
+            "value": "[listChannelWithKeys(resourceId('Microsoft.BotService/botServices/channels', parameters('botId'), 'DirectLineChannel'), '2018-07-12').properties.properties.sites[0].key]"
+        }
+    }
+}
