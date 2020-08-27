@@ -1,0 +1,41 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "variables": {
+        "sqlServer": "mysqlservernepeters",
+        "firewallRuleName": "AllowAllWindowsAzureIps"
+    },
+    "resources": [
+        {
+            "name": "[variables('sqlServer')]",
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2019-06-01-preview",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "administratorLogin": "adminUsername",
+                "administratorLoginPassword": "Password2020!"
+            },
+            "resources": [
+                {
+                    "name": "[variables('firewallRuleName')]",
+                    "type": "firewallRules",
+                    "apiVersion": "2015-05-01-preview",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers', variables('sqlServer'))]"
+                    ],
+                    "location": "[resourceGroup().location]",
+                    "properties": {
+                        "startIpAddress": "0.0.0.0",
+                        "endIpAddress": "0.0.0.0"
+                    }
+                }
+            ]
+        }
+    ],
+    "outputs": {
+        "firewallRules-id": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Sql/servers/firewallRules',variables('sqlServer'),variables('firewallRuleName'))]"
+        }
+    }
+}
