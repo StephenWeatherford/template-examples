@@ -14,13 +14,22 @@
             "properties": {
                 "administratorLogin": "adminUsername",
                 "administratorLoginPassword": "Password2020!"
-            }
+            },
+            "dependsOn": [
+                // ref to itself?
+                "[resourceId('Microsoft.Sql/servers', concat(variables('sqlServer')))]",
+
+                // ref to child?
+                "[resourceId('Microsoft.Sql/servers/firewallRules', concat(variables('sqlServer'), '/' , variables('firewallRuleName')))]"
+            ]
         },
         {
+            // Requires the parent as part of the name since they're decoupled
             "name": "[concat(variables('sqlServer'), '/' , variables('firewallRuleName'))]",
             "type": "Microsoft.Sql/servers/firewallRules",
             "apiVersion": "2015-05-01-preview",
             "dependsOn": [
+                // dependsOn reference to the parent is required for all child resources
                 "[resourceId('Microsoft.Sql/servers', variables('sqlServer'))]"
             ],
             "location": "[resourceGroup().location]",

@@ -17,10 +17,12 @@
             },
             "resources": [
                 {
+                    // Name must not include parent name since the child is nested
                     "name": "[variables('firewallRuleName')]",
                     "type": "firewallRules",
                     "apiVersion": "2015-05-01-preview",
                     "dependsOn": [
+                        // dependsOn reference to the parent is required for all child resources
                         "[resourceId('Microsoft.Sql/servers', variables('sqlServer'))]"
                     ],
                     "location": "[resourceGroup().location]",
