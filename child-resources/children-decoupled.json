@@ -16,11 +16,14 @@
                 "administratorLoginPassword": "Password2020!"
             },
             "dependsOn": [
-                // ref to itself?
-                "[resourceId('Microsoft.Sql/servers', concat(variables('sqlServer')))]",
+                // Reference to self not allowed
+                // "[resourceId('Microsoft.Sql/servers', variables('sqlServer'))]",
 
-                // ref to child?
-                "[resourceId('Microsoft.Sql/servers/firewallRules', concat(variables('sqlServer'), '/' , variables('firewallRuleName')))]"
+                // InvalidTemplate - Deployment template validation failed: 'The resource 'Microsoft.Sql/servers/mysqlserverneil2' is not defined in the template. Please see https://aka.ms/arm-template for usage details.'.
+                // "[resourceId('Microsoft.Sql/servers', concat(variables('sqlServer'), '2'))]",
+
+                // ref to not allowed
+                // "[resourceId('Microsoft.Sql/servers/firewallRules', variables('sqlServer'), variables('firewallRuleName'))]"
             ]
         },
         {
@@ -30,6 +33,9 @@
             "apiVersion": "2015-05-01-preview",
             "dependsOn": [
                 // dependsOn reference to the parent is required for all child resources
+                "[resourceId('Microsoft.Sql/servers', variables('sqlServer'))]",
+
+                // Duplicate reference okay?
                 "[resourceId('Microsoft.Sql/servers', variables('sqlServer'))]"
             ],
             "location": "[resourceGroup().location]",
@@ -37,7 +43,26 @@
                 "startIpAddress": "0.0.0.0",
                 "endIpAddress": "0.0.0.0"
             }
-        }
+        },
+      {
+          "name": "[uniqueString(resourceGroup().id)]",
+          "type": "Microsoft.Storage/storageAccounts",
+          "apiVersion": "2019-06-01",
+          "tags": {
+              "displayName": "storage1"
+          },
+          "location": "[resourceGroup().location]",
+          "kind": "StorageV2",
+          "sku": {
+              "name": "Premium_LRS",
+              "tier": "Premium"
+          },
+          "dependsOn": [
+            //   "[resourceId('Microsoft.Sql/servers', variables('sqlServer'))]",
+            //   "[resourceId('Microsoft.Sql/servers/firewallRules', variables('sqlServer'), variables('firewallRuleName'))]",
+            //   "[resourceId('Microsoft.Sql/servers/firewallRules', concat(variables('sqlServer'), variables('firewallRuleName')))]"
+          ]
+      }
     ],
     "outputs": {
         "firewallRules-id": {

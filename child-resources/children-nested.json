@@ -65,7 +65,17 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Sql/servers/firewallRules', variables('sqlServer'), variables('firewallRuleName'))]",
                 "[resourceId('Microsoft.Sql/servers/firewallRules', variables('sqlServer'), variables('firewallRuleName2'))]",
+                "[resourceId('Microsoft.Sql/servers', variables('sqlServer'))]",
+
+                // Duplicate ref okay
                 "[resourceId('Microsoft.Sql/servers', variables('sqlServer'))]"
+
+                // Name arguments must be separate for resourceId, can't concat them to a single arg
+                // InvalidTemplate - Deployment template validation failed: 'The template resource '7akxevcds3khc' at line '52' and column '9' is not valid: Unable to evaluate template language function 'resourceId': the type 'Microsoft.Sql/servers/firewallRules' requires '2' resource name argument(s). Please see https://aka.ms/arm-template-expressions/#resourceid for usage details.. Please see https://aka.ms/arm-template-expressions for usage details.'.
+                // "[resourceId('Microsoft.Sql/servers/firewallRules', concat(variables('sqlServer'), '/', variables('firewallRuleName2')))]",
+
+                // InvalidTemplate - Deployment template validation failed: 'The template resource '7akxevcds3khc' at line '52' and column '9' is not valid: Unable to evaluate template language function 'resourceId': function requires at least '2' argument(s) while '1' were provided. Please see https://aka.ms/arm-template-expressions/#resourceid for usage details.. Please see https://aka.ms/arm-template-expressions for usage details.'.
+                // "[resourceId('Microsoft.Sql/servers/firewallRules/mysqlservernepeters/AllowAllWindowsAzureIps')]"
             ]
         }
     ],
