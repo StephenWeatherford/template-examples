@@ -1,0 +1,78 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "variables": {
+        "sqlServer": "mysqlservernepeters",
+        "firewallRuleName": "AllowAllWindowsAzureIps",
+        "firewallRuleName2": "AllowAllWindowsAzureIps2"
+    },
+    "resources": [
+        {
+            "name": "[variables('sqlServer')]",
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2019-06-01-preview",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "administratorLogin": "adminUsername",
+                "administratorLoginPassword": "Password2020!"
+            },
+            "resources": [
+                {
+                    // Name normally doesn't include parent name since the child is nested
+                    "name": "[variables('firewallRuleName')]",
+                    "type": "firewallRules",
+                    "apiVersion": "2015-05-01-preview",
+                    "dependsOn": [
+                        // dependsOn reference to the parent is required for all child resources
+                        "[resourceId('Microsoft.Sql/servers', variables('sqlServer'))]"
+                    ],
+                    "location": "[resourceGroup().location]",
+                    "properties": {
+                        "startIpAddress": "0.0.0.0",
+                        "endIpAddress": "0.0.0.0"
+                    }
+                },
+                {
+                    // ... but it can as long as the type also includes the full type
+                    "name": "[concat(variables('sqlServer'), '/', variables('firewallRuleName2'))]",
+                    "type": "Microsoft.Sql/servers/firewallRules",
+                    "apiVersion": "2015-05-01-preview",
+                    "dependsOn": [
+                        // dependsOn reference to the parent is required for all child resources
+                        "[resourceId('Microsoft.Sql/servers', variables('sqlServer'))]"
+                    ],
+                    "location": "[resourceGroup().location]",
+                    "properties": {
+                        "startIpAddress": "0.0.0.0",
+                        "endIpAddress": "0.0.0.0"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "[uniqueString(resourceGroup().id)]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "tags": {
+                "displayName": "storageaccount1"
+            },
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Premium_LRS",
+                "tier": "Premium"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/firewallRules', variables('sqlServer'), variables('firewallRuleName'))]",
+                "[resourceId('Microsoft.Sql/servers/firewallRules', variables('sqlServer'), variables('firewallRuleName2'))]",
+                "[resourceId('Microsoft.Sql/servers', variables('sqlServer'))]"
+            ]
+        }
+    ],
+    "outputs": {
+        "firewallRules-id": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Sql/servers/firewallRules',variables('sqlServer'),variables('firewallRuleName'))]"
+        }
+    }
+}
