@@ -1,0 +1,312 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "projectName": {
+            "type": "string"
+        },
+        "TimeZoneID": {
+            "type": "string"
+        },
+        "loopCount": {
+            "type": "int"
+        },
+        "storageDiagName": {
+            "type": "string"
+        },
+        "vmName": {
+            "type": "string"
+        },
+        "subNetRef": {
+            "type": "string"
+        },
+        "vmSize": {
+            "type": "string"
+        },
+        "storageSkuType": {
+            "type": "string"
+        },
+        "adminUser": {
+            "type": "string"
+        },
+        "adminPasswd": {
+            "type": "securestring"
+        },
+        "intLbName": {
+            "type": "string"
+        },
+        "intLbBackEndPool": {
+            "type": "string"
+        },
+        "intLbBrokerIP": {
+            "type": "string"
+        },
+        "intLbWebGWIP": {
+            "type": "string"
+        },
+        "pubLbName": {
+            "type": "string"
+        },
+        "pubLbBackEndPool": {
+            "type": "string"
+        },
+        "adDomainName": {
+            "type": "string"
+        },
+        "firstDcIP": {
+            "type": "string"
+        },
+        "MainConnectionBroker": {
+            "type": "string"
+        },
+        "WebAccessServerName": {
+            "type": "string"
+        },
+        "WebAccessServerCount": {
+            "type": "int"
+        },
+        "SessionHostName": {
+            "type": "string"
+        },
+        "SessionHostCount": {
+            "type": "int"
+        },
+        "LicenseServerName": {
+            "type": "string"
+        },
+        "LicenseServerCount": {
+            "type": "int"
+        },
+        "ExternalFqdn": {
+            "type": "string"
+        },
+        "ExternalDnsDomain": {
+            "type": "string"
+        },
+        "dscFunction": {
+            "type": "string"
+        },
+        "dscLocation": {
+            "type": "string"
+        },
+        "ScriptName": {
+            "type": "string"
+        },
+        "requestCert": {
+            "type": "bool"
+        },
+        "createSqlServerAndDB": {
+            "type": "bool"
+        },
+        "sqlServerName": {
+            "type": "string"
+        },
+        "rdsDBName": {
+            "type": "string"
+        },
+        "webGwName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "ScriptPath": "[uri(parameters('dscLocation'),parameters('ScriptName'))]",
+        "empty": [],
+        "intlbPool": [
+            {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers',parameters('intLbName')),'/backendAddressPools/',parameters('intLbBackEndPool'))]"
+            }
+        ],
+        "pubIntlbPool": [
+            {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers',parameters('intLbName')),'/backendAddressPools/',parameters('intLbBackEndPool'))]"
+            },
+            {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers',parameters('pubLbName')),'/backendAddressPools/',parameters('pubLbBackEndPool'))]"
+            }
+        ],
+        "intlbRef": "[resourceId(resourceGroup().name,'Microsoft.Network/loadBalancers',parameters('intLbName'))]"
+    },
+    "resources": [
+        { // Public IP Addresses
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2019-12-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Static",
+                "dnsSettings": {
+                    "domainNameLabel": "[concat(parameters('vmName'),'pip',copyIndex(1))]"
+                }
+            },
+            "name": "[concat(parameters('vmName'),copyIndex(1),'pip')]",
+            "copy": {
+                "name": "[concat(parameters('vmName'),'pipcopy')]",
+                "count": "[parameters('loopCount')]"
+            }
+        }, // Public IP Addresses
+        { // Network Interfaces
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-12-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat(parameters('vmName'),copyIndex(1),'pip')]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig",
+                        "properties": {
+                            "subnet": {
+                                "id": "[parameters('subNetRef')]"
+                            },
+                            "privateIPAllocationMethod": "[if(contains(parameters('vmName'),'dc'),if(equals(copyIndex(1),1),'static','dynamic'),'dynamic')]",
+                            "privateIPAddress": "[if(contains(parameters('vmName'),'dc'),if(equals(copyIndex(1),1),parameters('firstDcIP'),json('null')),json('null'))]",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(parameters('vmName'),copyIndex(1),'pip'))]"
+                            },
+                            "loadBalancerBackendAddressPools": "[if(not(empty(parameters('intLbBackEndPool'))),if(not(empty(parameters('pubLbBackEndPool'))),variables('pubIntlbPool'),variables('intlbPool')),json('null'))]"
+                        }
+                    }
+                ]
+            },
+            "name": "[concat(parameters('vmName'),copyIndex(1),'nic1')]",
+            "copy": {
+                "name": "[concat(parameters('vmName'),'niccopy')]",
+                "count": "[parameters('loopCount')]"
+            }
+        }, // Network Interfaces
+        { // Virtual Machines
+            "type": "Microsoft.Compute/virtualMachines", // res1
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat(parameters('vmName'),copyIndex(1),'nic1')]" /*asdf */
+            ],
+            "properties": {
+                "licenseType": "Windows_Server",
+                "billingProfile": {
+                    "maxPrice": -1
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[concat('https://',parameters('storageDiagName'),'.blob.core.windows.net/')]"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('vmName'),copyIndex(1),'nic1'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "adminUsername": "[parameters('adminUser')]",
+                    "adminPassword": "[parameters('adminPasswd')]",
+                    "computerName": "[concat(parameters('vmName'),copyIndex(1))]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "priority": "Spot",
+                "evictionPolicy": "Deallocate",
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[parameters('storageSkuType')]"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2019-Datacenter",
+                        "version": "latest"
+                    }
+                }
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Compute/virtualMachines/extensions",
+                    "apiVersion": "2019-12-01",
+                    "name": "[concat(parameters('vmName'),copyIndex(1),'/dscext')]",
+                    "location": "[resourceGroup().location]",
+                    "condition": "[not(empty(parameters('dscFunction')))]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Compute/virtualMachines/extensions', concat(parameters('vmName'),copyIndex(1),'/dscext'))]"
+                    ],
+                    "properties": {
+                        "publisher": "Microsoft.Powershell",
+                        "type": "DSC",
+                        "typeHandlerVersion": "2.11",
+                        "autoUpgradeMinorVersion": true,
+                        "settings": {
+                            "ModulesUrl": "[concat(parameters('dscLocation'),'DSC/DeployRDSLab.zip')]",
+                            "ConfigurationFunction": "[parameters('dscFunction')]",
+                            "Properties": {
+                                "AdminCreds": {
+                                    "UserName": "[parameters('adminUser')]",
+                                    "Password": "PrivateSettingsRef:AdminPassword"
+                                },
+                                "RDSParameters": [
+                                    {
+                                        "TimeZoneID": "[parameters('TimeZoneID')]",
+                                        "DomainName": "[parameters('adDomainName')]",
+                                        "DNSServer": "[parameters('firstDcIP')]",
+                                        "MainConnectionBroker": "[parameters('MainConnectionBroker')]",
+                                        "WebAccessServer": "[concat(parameters('WebAccessServerName'),'1')]",
+                                        "SessionHost": "[concat(parameters('SessionHostName'),'1')]",
+                                        "LicenseServer": "[concat(parameters('LicenseServerName'),'1')]",
+                                        "ExternalFqdn": "[parameters('ExternalFqdn')]",
+                                        "ExternalDnsDomain": "[parameters('ExternalDnsDomain')]",
+                                        "IntBrokerLBIP": "[parameters('intLbBrokerIP')]",
+                                        "IntWebGWLBIP": "[parameters('intLbWebGWIP')]",
+                                        "WebGWDNS": "[parameters('webGwName')]"
+                                    }
+                                ]
+                            }
+                        },
+                        "protectedSettings": {
+                            "Items": {
+                                "AdminPassword": "[parameters('adminPasswd')]"
+                            }
+                        }
+                    }
+                },
+                {
+                    "type": "Microsoft.Compute/virtualMachines/extensions",
+                    "apiVersion": "2019-12-01",
+                    "name": "[concat(parameters('vmName'),copyIndex(1),'/pwshext')]",
+                    "location": "[resourceGroup().location]",
+                    "condition": "[and(contains(parameters('vmName'),'cb'),parameters('requestCert'))]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Compute/virtualMachines',concat(parameters('vmName'),copyIndex(1)))]", //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                        "[resourceId('Microsoft.Compute/virtualMachines/extensions',concat(parameters('vmName'),copyIndex(1)),'dscext')]", //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                        ""
+                    ],
+                    "properties": {
+                        "publisher": "Microsoft.Compute",
+                        "type": "CustomScriptExtension",
+                        "typeHandlerVersion": "1.10",
+                        "autoUpgradeMinorVersion": true,
+                        "settings": {
+                            "fileUris": [
+                                "[variables('ScriptPath')]"
+                            ]
+                        },
+                        "protectedSettings": {
+                            "commandToExecute": "[concat('powershell -ExecutionPolicy Bypass -File ./',parameters('ScriptName'),' -ProjectName ',parameters('projectName'),' -MainConnectionBroker ',parameters('MainConnectionBroker'),' -BrokerFqdn ',concat('broker.',parameters('ExternalDnsDomain')),' -WebGatewayFqdn ',parameters('ExternalFqdn'),' -AzureSQLFQDN ',concat(parameters('projectName'),parameters('sqlServerName'),'.database.windows.net'),' -AzureSQLDBName ',parameters('rdsDBName'),' -Passwd ',parameters('adminPasswd'),' -WebAccessServerName ',parameters('WebAccessServerName'),' -WebAccessServerCount ',parameters('WebAccessServerCount'),' -SessionHostName ',parameters('SessionHostName'),' -SessionHostCount ',parameters('SessionHostCount'),' -LicenseServerName ',parameters('LicenseServerName'),' -LicenseServerCount ',parameters('LicenseServerCount'))]"
+                        }
+                    }
+                }
+            ],
+            "name": "[concat(parameters('vmName'),copyIndex(1))]",
+            "copy": {
+                "name": "[concat(parameters('vmName'),'vmcopy')]",
+                "count": "[parameters('loopCount')]"
+            }
+        } // Virtual Machines
+    ]
+}
