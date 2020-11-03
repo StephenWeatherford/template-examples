@@ -26,7 +26,8 @@
     "variables": {
         "linkedTemplates": {
             "loadBalancer": "[concat(parameters('_artifactsLocation'), 'linkedTemplates/public-ip-parentloadbalancer.json', parameters('_artifactsLocationSasToken'))]"
-        }
+        },
+        "intVar": 123
     },
     "resources": [
         {
@@ -37,16 +38,22 @@
                 "mode": "Incremental",
                 "templateLink": {
                     "uri": "[variables('linkedTemplates').loadBalancer]",
-                    "contentVersion": "1.0.0.0"
+                    // BUG: contentVersion doesn't match linked template's content version
+                    "contentVersion": "1.0.0.1"
                 },
                 "parameters": {
-                    "loadBalancers_name": {
-                        "type": "string",
+                    // BUG: Misspelled parameter name
+                    "loadBalancers_name_whoops": {
                         "value": "[parameters('loadBalancers_name')]"
-                    },
+                    }
+                    /* BUG: missing required parameter
                     "publicIPAddresses_name": {
-                        "type": "string",
                         "value": "[parameters('publicIPAddresses_name')]"
+                    }
+                    */,
+                    "loadBalancers_location": {
+                        // BUG: Incorrect parameter type, should be string
+                        "value": "[variables('intVar')]"
                     }
                 }
             }

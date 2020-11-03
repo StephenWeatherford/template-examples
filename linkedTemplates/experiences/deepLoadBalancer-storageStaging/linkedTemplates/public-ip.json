@@ -15,7 +15,8 @@
             "location": "eastus",
             "properties": {
                 "publicIPAddressVersion": "IPv4",
-                "publicIPAllocationMethod": "Dynamic",
+                // BUG: Missing required property publicIPAllocationMethod
+                // "publicIPAllocationMethod": "Dynamic",
                 "idleTimeoutInMinutes": 4
             },
             "dependsOn": []

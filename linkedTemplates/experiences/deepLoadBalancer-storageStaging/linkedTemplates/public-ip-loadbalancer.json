@@ -11,6 +11,10 @@
         "publicIPAddresses_name": {
             "defaultValue": "myip",
             "type": "string"
+        },
+        "loadBalancers_location": {
+            "defaultValue": "westus",
+            "type": "string"
         }
     },
     "variables": {},
@@ -18,7 +22,8 @@
         {
             "type": "Microsoft.Network/loadBalancers",
             "name": "[parameters('loadBalancers_name')]",
-            "apiVersion": "2017-06-01",
+            // BUG: Invalid API version
+            "apiVersion": "2017-06-01-invalid",
             "location": "eastus",
             "properties": {
                 "frontendIPConfigurations": [
@@ -53,11 +58,18 @@
                     // parent: "uri": "[uri(deployment().properties.templateLink.uri, 'public-ip.json')]",
                     "relativePath": "public-ip.json",
                     "contentVersion": "1.0.0.0"
-                },
+                }
+                /* BUG: Missing required parameter
                 "parameters": {
                     "publicIPAddresses_name": { "value": "[parameters('publicIPAddresses_name')]" }
-                }
+                }*/
             }
         }
-    ]
+    ],
+    "outputs": {
+        "output1": {
+            "type": "string",
+            "value": "[parameters('loadBalancers_location')]"
+        }
+    }
 }
