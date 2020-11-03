@@ -1,0 +1,26 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "iotHubName": {
+        "type": "string",
+        "defaultValue": "hello"
+      }
+    },
+    "variables": {
+      "iotHubResourceId": "[resourceId('a', 'b')]",
+      "iotHubKeyName": "name",
+      "iotHubApiVersion": "00-00-00",
+      "iotHubKeyIndex": 0
+    },
+    "resources": [
+      {
+        "name": "[parameters('iotHubName')]",
+        "resourceId": "[variables('iotHubResourceId')]",
+        "ioTHubConnectionString": "[listkeys(variables('iotHubResourceId'), variables('iotHubApiVersion')).keys]",
+        "eventHubConnectionString": "[concat('Endpoint=', reference(variables('iotHubResourceId'), variables('iotHubApiVersion')).eventHubEndpoints.events.endpoint, ';SharedAccessKeyName=', variables('iotHubKeyName'), ';SharedAccessKey=', listKeys(variables('iotHubResourceId'), variables('iotHubApiVersion')).value[variables('iotHubKeyIndex')].primaryKey, ';EntityPath=', reference(variables('iotHubResourceId'), variables('iotHubApIVersion')).eventHubEndpoints.events.path)]"
+      }
+    ],
+    "outputs": {
+    }
+  }

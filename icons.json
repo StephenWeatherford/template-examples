@@ -105,8 +105,57 @@
     }],
     "resources": [
         {
+            "name": "[myFunctions.vmName(parameters('virtualMachineName'),copyindex(1))]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2017-03-30",
+            "location": "[variables('location')]",
+            "copy": {
+                "name": "virtualMachineLoop",
+                "count": "[parameters('vmCount')]"
+            },
+            "dependsOn": [
+                "[myFunctions.nicName(parameters('virtualMachineName'),copyindex(1))]"
+            ],
+            "properties": {
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachineName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "windowsConfiguration": {
+                        "provisionVmAgent": true
+                    }
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('virtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2016-Datacenter",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "[myFunctions.diskName(parameters('virtualMachineName'),copyindex(1))]",
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "Premium_LRS"
+                        }
+                    },
+                    "dataDisks": []
+                },
+                "networkProfile": {
+                    "networkInterfaces": [{
+                        "id": "[resourceId('Microsoft.Network/networkInterfaces', myFunctions.nicName(parameters('virtualMachineName'),copyindex(1)))]"
+                    }]
+                },
+                "licenseType": "Windows_Server"
+            }
+        },
+                {
             "name": "config",
-            "type": "config"
+            "apiversion": "config",
+            "type": "hi"
         },
         {
             "name": "webApp1",
@@ -451,7 +500,7 @@
             }
         },
         {
-            "name": "applicationSecurityGroup1",
+            "name": "[concat(variables('applicationSecurityGroup1'), '/', parameters('abc'))]",
             "type": "Microsoft.Network/applicationSecurityGroups",
             "apiVersion": "2018-08-01",
             "location": "[resourceGroup().location]",
