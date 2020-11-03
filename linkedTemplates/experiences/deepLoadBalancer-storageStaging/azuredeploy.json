@@ -3,12 +3,19 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "_artifactsLocation": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "The base URI where artifacts required by this template are located including a trailing '/'"
+            },
+            "defaultValue": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/[name of sample folder]/" // use this for a Quickstart in this repo (we're working on fixing this to match the marketplace...)
         },
         "_artifactsLocationSasToken": {
-            "type": "string",
-            "defaultValue": "?MySasToken"
-        },
+            "type": "securestring",
+            "metadata": {
+                "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated. Use the defaultValue if the staging location is not secured."
+            },
+            "defaultValue": ""
+        }
         "loadBalancers_name": {
             "defaultValue": "mylb",
             "type": "string"
