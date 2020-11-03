@@ -1,0 +1,50 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "_artifactsLocation": {
+            "type": "string"
+        },
+        "_artifactsLocationSasToken": {
+            "type": "string",
+            "defaultValue": "?MySasToken"
+        },
+        "loadBalancers_name": {
+            "defaultValue": "mylb",
+            "type": "string"
+        },
+        "publicIPAddresses_name": {
+            "defaultValue": "myip",
+            "type": "string"
+        }
+    },
+    "variables": {
+        "linkedTemplates": {
+            "loadBalancer": "[concat(parameters('_artifactsLocation'), 'linkedTemplates/public-ip-parentloadbalancer.json', parameters('_artifactsLocationSasToken'))]"
+        }
+    },
+    "resources": [
+        {
+            "name": "linkedDeployment1",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('linkedTemplates').loadBalancer]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "loadBalancers_name": {
+                        "type": "string",
+                        "value": "[parameters('loadBalancers_name')]"
+                    },
+                    "publicIPAddresses_name": {
+                        "type": "string",
+                        "value": "[parameters('publicIPAddresses_name')]"
+                    }
+                }
+            }
+        }
+    ]
+}
