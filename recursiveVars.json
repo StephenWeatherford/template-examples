@@ -1,0 +1,31 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        /* InvalidTemplate - Deployment template validation failed: 'The template resource 'p1' at line '5' and column '15' is not valid: The template function 'variables' is not expected at this location. Please see https://aka.ms/arm-template-expressions for usage details.. Please see https://aka.ms/arm-template-expressions for usage details.'.
+        "p1": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            },
+            "defaultValue": "[variables('v2')]"
+        }*/
+    },
+    "functions": [],
+    "variables": {
+        // This is fine:
+        "v2": "[concat(variables('v1'), 'and v2')]",
+        "v1": "v1"
+
+        // InvalidTemplate - Deployment template validation failed: 'The template variable 'v2' is not valid: Circular dependency detected in template language expression: 'v2'. Please see https://aka.ms/arm-template-expressions for usage details.. Please see https://aka.ms/arm-template-expressions for usage details.'.
+        // "v2": "[concat(variables('v1'), 'and v2')]",
+        // "v1": "[concat(variables('v2'), 'and v1')]"
+    },
+    "resources": [],
+    "outputs": {
+        "output1": {
+            "type": "string",
+            "value": "[variables('v2')]"
+        }
+    }
+}

@@ -1,0 +1,58 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2019-12-01",
+            "name": "[concat(parameters('vmName'),copyIndex(1),'/dscext')]",
+            "location": "[resourceGroup().location]",
+            "condition": "[not(empty(parameters('dscFunction')))]",
+            "dependsOn": [
+                 // >>> CURSOR ON FOLLOWING LINE INSIDE RESOURCEID NAME
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', concat(parameters('vmName'),copyIndex(1),'/dscext'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Powershell",
+                "type": "DSC",
+                "typeHandlerVersion": "2.11",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "ModulesUrl": "[concat(parameters('dscLocation'),'DSC/DeployRDSLab.zip')]",
+                    "ConfigurationFunction": "[parameters('dscFunction')]",
+                    "Properties": {
+                        "AdminCreds": {
+                            "UserName": "[parameters('adminUser')]",
+                            "Password": "PrivateSettingsRef:AdminPassword"
+                        },
+                        "RDSParameters": [
+                            {
+                                "TimeZoneID": "[parameters('TimeZoneID')]",
+                                "DomainName": "[parameters('adDomainName')]",
+                                "DNSServer": "[parameters('firstDcIP')]",
+                                "MainConnectionBroker": "[parameters('MainConnectionBroker')]",
+                                "WebAccessServer": "[concat(parameters('WebAccessServerName'),'1')]",
+                                "SessionHost": "[concat(parameters('SessionHostName'),'1')]",
+                                "LicenseServer": "[concat(parameters('LicenseServerName'),'1')]",
+                                "ExternalFqdn": "[parameters('ExternalFqdn')]",
+                                "ExternalDnsDomain": "[parameters('ExternalDnsDomain')]",
+                                "IntBrokerLBIP": "[parameters('intLbBrokerIP')]",
+                                "IntWebGWLBIP": "[parameters('intLbWebGWIP')]",
+                                "WebGWDNS": "[parameters('webGwName')]"
+                            }
+                        ]
+                    }
+                },
+                "protectedSettings": {
+                    "Items": {
+                        "AdminPassword": "[parameters('adminPasswd')]"
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}

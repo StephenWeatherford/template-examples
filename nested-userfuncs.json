@@ -52,6 +52,18 @@
                                                         "type": "string",
                                                         "value": "[parameters('innerp1')]" // References inner func1's p1
                                                     }
+                                                },
+                                                "func2": {
+                                                    "parameters": [
+                                                        {
+                                                            "name": "innerp1",
+                                                            "type": "string"
+                                                        }
+                                                    ],
+                                                    "output": {
+                                                        "type": "string",
+                                                        "value": "[concat(parameters('innerp1'), 'suffix')]" // References inner func1's p1
+                                                    }
                                                 }
                                             }
                                         }

@@ -1,0 +1,139 @@
+// from azure-quickstart-templates/101-azure-database-migration-service/azuredeploy.json
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "resources": [
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[variables('sourceServerName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('sourceNicName'))]"
+            ],            
+            "resources": [
+                {
+                    "type": "extensions",
+                    "name": "SqlIaasExtension",
+                    "dependsOn": [
+                        "[concat('Microsoft.Compute/virtualMachines/', variables('sourceServerName'))]"
+                    ]
+                },
+                {
+                    "type": "extensions",
+                    "name": "CustomScriptExtension",
+                    "dependsOn": [
+                        "[concat('Microsoft.Compute/virtualMachines/', variables('sourceServerName'))]",
+                        "[concat('Microsoft.Compute/virtualMachines/', concat(variables('sourceServerName'),'/extensions/SqlIaasExtension'))]"
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.DataMigration/services",
+            "name": "[variables('DMSServiceName')]",
+            "properties": {
+                "virtualSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('adVNet'), variables('defaultSubnetName'))]"
+            },
+            "resources": [
+                {
+                    "type": "projects",
+                    "name": "SqlToSqlDbMigrationProject",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.DataMigration/services', variables('DMSServiceName'))]"
+                    ]
+                }
+            ],
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('adVNet'), variables('defaultSubnetName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('sourceNicName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('adVNet'), variables('defaultSubnetName'))]",
+                "[resourceId('Microsoft.Network/publicIpAddresses', variables('publicIPSourceServer'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig",
+                        "properties": {
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('adVNet'), variables('defaultSubnetName'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('sourceServerNSG')]"
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('publicIPSourceServer')]"
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('adVNet')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.2.0.0/24"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "default",
+                        "properties": {
+                            "addressPrefix": "10.2.0.0/24"
+                        }
+                    }
+                ],
+            },
+            "resources": [
+                {
+                    "type": "subnets",
+                    "name": "[variables('defaultSubnetName')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/virtualNetworks', variables('adVNet'))]"
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('storageAccountName')]"
+        },
+        {
+            "type": "Microsoft.Sql/servers",
+            "name": "[concat(variables('targetServerName'))]",
+            "resources": [
+                {
+                    "type": "databases",
+                    "name": "[variables('databaseName')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers', concat(variables('targetServerName')))]"
+                    ],
+                    "resources": [
+                        {
+                            "name": "Import",
+                            "type": "extensions",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.Sql/servers/databases', variables('targetServerName'), variables('databaseName'))]"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "firewallrules",
+                    "name": "AllowAllWindowsAzureIps",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers', concat(variables('targetServerName')))]"
+                    ]
+                }
+            ]
+        }
+    ]
+}

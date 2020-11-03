@@ -1,0 +1,73 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "variables": {
+        "sqlServer": "mysqlserverneil",
+        "firewallRuleName": "AllowAllWindowsAzureIps"
+    },
+    "resources": [
+        {
+            "name": "[variables('sqlServer')]",
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2014-04-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "administratorLogin": "adminUsername",
+                "administratorLoginPassword": "Password2020!"
+            },
+            "dependsOn": [
+                // Reference to self not allowed
+                // "[resourceId('Microsoft.Sql/servers', variables('sqlServer'))]",
+
+                // InvalidTemplate - Deployment template validation failed: 'The resource 'Microsoft.Sql/servers/mysqlserverneil2' is not defined in the template. Please see https://aka.ms/arm-template for usage details.'.
+                // "[resourceId('Microsoft.Sql/servers', concat(variables('sqlServer'), '2'))]",
+
+                // ref to not allowed
+                // "[resourceId('Microsoft.Sql/servers/firewallRules', variables('sqlServer'), variables('firewallRuleName'))]"
+            ]
+        },
+        {
+            // Requires the parent as part of the name since they're decoupled
+            "name": "[concat(variables('sqlServer'), '/' , variables('firewallRuleName'))]",
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "dependsOn": [
+                // dependsOn reference to the parent is required for all child resources
+                "[resourceId('Microsoft.Sql/servers', variables('sqlServer'))]",
+
+                // Duplicate reference okay?
+                "[resourceId('Microsoft.Sql/servers', variables('sqlServer'))]"
+            ],
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "startIpAddress": "0.0.0.0",
+                "endIpAddress": "0.0.0.0"
+            }
+        },
+      {
+          "name": "[uniqueString(resourceGroup().id)]",
+          "type": "Microsoft.Storage/storageAccounts",
+          "apiVersion": "2019-06-01",
+          "tags": {
+              "displayName": "storage1"
+          },
+          "location": "[resourceGroup().location]",
+          "kind": "StorageV2",
+          "sku": {
+              "name": "Premium_LRS",
+              "tier": "Premium"
+          },
+          "dependsOn": [
+            //   "[resourceId('Microsoft.Sql/servers', variables('sqlServer'))]",
+            //   "[resourceId('Microsoft.Sql/servers/firewallRules', variables('sqlServer'), variables('firewallRuleName'))]",
+            //   "[resourceId('Microsoft.Sql/servers/firewallRules', concat(variables('sqlServer'), variables('firewallRuleName')))]"
+          ]
+      }
+    ],
+    "outputs": {
+        "firewallRules-id": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Sql/servers/firewallRules',variables('sqlServer'),'AllowAllWindowsAzureIps')]"
+        }
+    }
+}
