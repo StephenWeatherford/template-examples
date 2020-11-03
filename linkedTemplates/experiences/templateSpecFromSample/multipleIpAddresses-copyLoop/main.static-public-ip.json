@@ -1,0 +1,32 @@
+{
+    // from https://github.com/Azure/azure-docs-json-samples/blob/master/azure-resource-manager/linkedtemplates/static-public-ip-parent.json
+    // Modified to use relativePath
+
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+    },
+    "variables": {},
+    "resources": [
+        {
+            "apiVersion": "2017-05-10",
+            "name": "[concat('linkedTemplate', copyIndex())]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                // original: "uri": "[uri(deployment().properties.templateLink.uri, 'static-public-ip.json')]",
+                "relativePath": "static-public-ip.json",
+                "contentVersion": "1.0.0.0"
+              },
+              "parameters":{
+                  "publicIPAddresses_name":{"value": "[concat('myip-', copyIndex())]"}
+              }
+            },
+            "copy": {
+                "count": 3,
+                "name": "ip-loop"
+            }
+          }
+    ]
+}
