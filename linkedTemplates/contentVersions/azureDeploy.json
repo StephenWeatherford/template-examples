@@ -12,7 +12,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(deployment().location, 'linked.json')]",
+                    "uri": "https://raw.githubusercontent.com/StephenWeatherford/template-examples/master/linkedTemplates/contentVersions/linked.json",
                     "contentVersion": "2.0.0.0"
                 },
                 "parameters": {
