@@ -8,11 +8,11 @@
         {
             "name": "linkedDeployment1",
             "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2020-06-01",
+            "apiVersion": "2020-06-02",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "relativePath": "child.json2",
+                    "relativePath": "child.json",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
