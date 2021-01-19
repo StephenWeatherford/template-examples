@@ -6,17 +6,17 @@
     "variables": {},
     "resources": [
         {
-            "name": "linkedDeployment1",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-10-01",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat('artifactsLocation', '/child.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                }
+            "name": "storageaccount1",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "tags": {
+                "displayName": "storageaccount1"
+            },
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Premium_LRS",
+                "tier": "Premium"
             }
         }
     ],
