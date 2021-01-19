@@ -1,0 +1,78 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "projectName": {
+            "value": "rds"
+        },
+        "DNSEntry": {
+            "value": "remoteapps"
+        },
+        "DNSZone": {
+            "value": "contoso.com"
+        },
+        "vmNames": {
+            "value": [
+                "[concat(parameters('projectName'),'dc')]",
+                "[concat(parameters('projectName'),'wg')]",
+                "[concat(parameters('projectName'),'cb')]",
+                "[concat(parameters('projectName'),'sh')]",
+                "[concat(parameters('projectName'),'lf')]"
+            ]
+        },
+        "dcCount": {
+            "value": 2
+        },
+        "rdcbCount": {
+            "value": 2
+        },
+        "rdwgCount": {
+            "value": 2
+        },
+        "rdshCount": {
+            "value": 2
+        },
+        "lsfsCount": {
+            "value": 2
+        },
+        "vmProperties": {
+            "value": [
+                { // Domain Controller VMs
+                    "name": "[parameters('vmNames')[0]]",
+                    "count": "[parameters('dcCount')]",
+                    "intLbBackEndPool": "",
+                    "pubLbBackEndPool": "",
+                    "dscFunction": "DeployRDSLab.ps1\\CreateRootDomain"
+                },
+                { // Remote Desktop Web/Gateway VMs
+                    "name": "[parameters('vmNames')[1]]",
+                    "count": "[parameters('rdwgCount')]",
+                    "intLbBackEndPool": "rds-webgateways-int-pool",
+                    "pubLbBackEndPool": "rds-webgateways-pub-pool",
+                    "dscFunction": "DeployRDSLab.ps1\\RDWebGateway"
+                },
+                { // Remote Desktop Connection Broker VMs
+                    "name": "[parameters('vmNames')[2]]",
+                    "count": "[parameters('rdcbCount')]",
+                    "intLbBackEndPool": "rds-brokers-int-pool",
+                    "pubLbBackEndPool": "",
+                    "dscFunction": "DeployRDSLab.ps1\\RDSDeployment"
+                },
+                { // Remote Desktop Session Host VMs
+                    "name": "[parameters('vmNames')[3]]",
+                    "count": "[parameters('rdshCount')]",
+                    "intLbBackEndPool": "",
+                    "pubLbBackEndPool": "",
+                    "dscFunction": "DeployRDSLab.ps1\\RDSessionHost"
+                },
+                { // License Server/File Server VMs
+                    "name": "[parameters('vmNames')[4]]",
+                    "count": "[parameters('lsfsCount')]",
+                    "intLbBackEndPool": "",
+                    "pubLbBackEndPool": "",
+                    "dscFunction": "DeployRDSLab.ps1\\RDLicenseServer"
+                }
+            ]
+        }
+    }
+}

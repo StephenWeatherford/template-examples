@@ -1,0 +1,175 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('projectName'), 'stgdiag')]"
+        },
+        { 
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-12-01",
+            "name": "[concat(parameters('projectName'),'nsg')]"
+        }, 
+        { 
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2019-12-01",
+            "name": "[concat(parameters('projectName'),'vnet')]",
+            "dependsOn": [
+                "[variables('nsgRef')]"
+            ]
+        },
+        { 
+            "type": "Microsoft.Network/loadBalancers",
+            "apiVersion": "2019-12-01",
+            "name": "[concat(parameters('projectName'),'intlb')]",
+            "dependsOn": [
+                "[concat(parameters('projectName'),'vnet')]"
+            ],
+            "properties": {
+                "loadBalancingRules": [
+                    {
+                        "name": "rds-brokers-tcp-rule",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers',concat(parameters('projectName'),'intlb')),'/frontendIpConfigurations/rds-brokers-frontend')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        }, 
+        {
+            "name": "[concat(parameters('projectName'),'lbwebgwpip')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2019-11-01"
+        }, 
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[concat(parameters('projectName'),'dnsupdate')]",
+            "dependsOn": [
+                "[concat(parameters('projectName'),'lbwebgwpip')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {},
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "name": "[parameters('DNSZone')]",
+                            "type": "Microsoft.Network/dnsZones",
+                            "apiVersion": "2018-05-01",
+                            "location": "global",
+                            "properties": {}
+                        }
+                    ]
+                }
+            }
+        }, 
+        { 
+            "name": "[concat(parameters('projectName'),'publb')]",
+            "type": "Microsoft.Network/loadBalancers",
+            "apiVersion": "2019-11-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses',concat(parameters('projectName'),'lbwebgwpip'))]",
+                "[concat(parameters('projectName'),'vnet')]"
+            ]
+        }, 
+        { 
+            "name": "[concat(parameters('projectName'),variables('sqlServerName'))]",
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2019-06-01-preview",
+            "resources": [
+                {
+                    "type": "firewallRules",
+                    "apiVersion": "2014-04-01",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers', concat(parameters('projectName'),variables('sqlServerName')))]"
+                    ],
+                    "name": "AllowAllWindowsAzureIps"
+                }
+            ]
+        }, 
+        { 
+            "name": "[concat(parameters('projectName'),'sqlsrv/',variables('rdsDBName'))]",
+            "type": "Microsoft.Sql/servers/databases",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', concat(parameters('projectName'),'sqlsrv'))]"
+            ]
+        }, 
+        { 
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[concat(parameters('vmProperties')[copyIndex()].name,'Deployment')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks',concat(parameters('projectName'),'vnet'))]",
+                "[concat(parameters('projectName'),'intlb')]",
+                "[concat(parameters('projectName'),'publb')]",
+                "[concat(parameters('projectName'),'sqlsrv')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "expressionEvaluationOptions": {
+                    "scope": "inner"
+                },
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "Microsoft.Compute/virtualMachines", // res1
+                            "apiVersion": "2019-07-01",
+                            "location": "[resourceGroup().location]",
+                            "dependsOn": [
+                                "[concat(parameters('vmName'),copyIndex(1),'nic1')]" //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                            ],
+                            "properties": {
+                                "networkProfile": {
+                                    "networkInterfaces": [
+                                        {
+                                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('vmName'),copyIndex(1),'nic1'))]" // <<<<<
+                                        }
+                                    ]
+                                }
+                            },
+                            "resources": [
+                                {
+                                    "type": "Microsoft.Compute/virtualMachines/extensions",
+                                    "apiVersion": "2019-12-01",
+                                    "name": "[concat(parameters('vmName'),copyIndex(1),'/dscext')]",
+                                    "dependsOn": [
+                                        "[resourceId('Microsoft.Compute/virtualMachines',concat(parameters('vmName'),copyIndex(1)))]" // <<< res1
+                                    ]
+                                },
+                                {
+                                    "type": "Microsoft.Compute/virtualMachines/extensions",
+                                    "apiVersion": "2019-12-01",
+                                    "name": "[concat(parameters('vmName'),copyIndex(1),'/pwshext')]",
+                                    "dependsOn": [
+                                        "[resourceId('Microsoft.Compute/virtualMachines',concat(parameters('vmName'),copyIndex(1)))]", //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                                        "[resourceId('Microsoft.Compute/virtualMachines/extensions',concat(parameters('vmName'),copyIndex(1)),'dscext')]" //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                                    ]
+                                }
+                            ],
+                            "name": "[concat(parameters('vmName'),copyIndex(1))]",
+                            "copy": {
+                                "name": "[concat(parameters('vmName'),'vmcopy')]",
+                                "count": "[parameters('loopCount')]"
+                            }
+                        } 
+                    ]
+                }
+            },
+            "copy": {
+                "name": "vmCopy",
+                "count": "[length(parameters('vmProperties'))]"
+            }
+        }
+    ]
+}

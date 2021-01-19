@@ -15,6 +15,26 @@
             "properties": {
               "mode": "Incremental",
               "templateLink": {
+                //"uri": "[uri(deployment().properties.templateLink.uri, 'static-public-ip.json')]",
+                "relativePath": "static-public-ip.json",
+                "contentVersion": "1.0.0.0"
+              },
+              "parameters":{
+                  "publicIPAddresses_name":{"value": "[concat('myip-', copyIndex())]"}
+              }
+            },
+            "copy": {
+                "count": 1,    
+                "name": "ip-loop"
+            }
+          },
+          {
+            "apiVersion": "2017-05-10",
+            "name": "[concat('linkedTemplate', copyIndex())]", 
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+              "mode": "Incremental",
+              "templateLink": {
                 // original: "uri": "[uri(deployment().properties.templateLink.uri, 'static-public-ip.json')]",
                 "relativePath": "static-public-ip.json",
                 "contentVersion": "1.0.0.0"
@@ -24,9 +44,9 @@
               }
             },
             "copy": {
-                "count": 3,
+                "count": 2,
                 "name": "ip-loop"
-            }
+            } 
           }
     ]
 }

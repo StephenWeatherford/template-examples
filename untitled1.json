@@ -129,7 +129,7 @@
             ],
             "properties": {
                 "osProfile": {
-                    "computerName": "[parameters('virtualMachineName')]",
+                    "computerName": "asdf",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]"
                 },

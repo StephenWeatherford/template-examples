@@ -1,0 +1,184 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+            "name": "my name",
+            "type": "Microsoft.AAD/domainServices",
+            "resources": [
+                {
+                    "name": "[format('{0}/default/logs', variables('storageAccountName'))]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[parameter('a')]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[parameterss('a')]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[parameters('a')]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[variables('sqlServer')]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[(variables('sqlServer')+variables('abc'))]",
+                    "type": "abc"
+                },
+
+                // concat strings
+                {
+                    "name": "[concat(a)]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[concat('a', 'b')]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[concat(variables('sqlServer'), 'a')]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[concat(variables('sqlServer'),'b',variables('abc'))]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[concat(variables('sqlServer'), '/', variables('firewallRuleName2'))]",
+                    "type": "abc"
+                },
+
+                // concat other things
+                {
+                    "name": "[concat(a, 1)]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[concat('a', 1)]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[concat(1, 2)]",
+                    "type": "abc"
+                },
+
+                // nested concat
+                {
+                    "name": "[concat(concat(a))]",
+                    "type": "abc"
+                },
+
+                //asdf child-resources/children-nested.json
+                {
+                    "name": "AllowAllWindowsAzureIps",
+                    "type": "abc"
+                },
+                {
+                    "name": "2019-06-01-preview",
+                    "type": "abc"
+                },
+                {
+                    "name": "[resourceGroup().location]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[uniqueString(resourceGroup().id)]",
+                    "type": "abc"
+                },
+
+                //asdf 101-sql-logical-server.json
+                {
+                    "name": "Microsoft.Storage/storageAccounts/providers/roleAssignments",
+                    "type": "abc"
+                },
+                {
+                    "name": "[concat(variables('storageName'), '/Microsoft.Authorization/', variables('uniqueRoleGuid') )]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[resourceGroup().name]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[tolower(concat('sqlva', variables('uniqueStorage')))]",
+                    "type": "abc"
+                },
+
+                // asdf copy-in-outputs3.json
+                {
+                    "name": "[concat(parameters('rgNamePrefix'),'-',parameters('rgEnvList')[copyIndex()])]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[concat('nic-', copyIndex())]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[array(json('[\"one\",\"two\",\"three\"]'))[copyIndex()]]",
+                    "type": "abc"
+                },
+
+                {
+                    "name": "[if(parameters('globalRedundancy'), 'Standard_GRS', 'Standard_LRS')]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[format('{0}/default/logs', variables('storageAccountName'))]",
+                    "type": "abc"
+                },
+
+                //asdf icons.json
+                {
+                    "name": "[myFunctions.vmName(parameters('virtualMachineName'),copyindex(1))]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[myFunctions.diskName(parameters('virtualMachineName'),copyindex(1))]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[myFunctions.nicName(parameters('virtualMachineName'),copyindex(1))]",
+                    "type": "abc"
+                },
+
+                //asdf keyvalue-with-param.json
+                {
+                    "name": "[concat('sql-', uniqueString(resourceGroup().id, 'sql'))]",
+                    "type": "abc"
+                },
+
+                {
+                    "name": "[concat(parameters('storagePrefix'), uniqueString(resourceGroup().id))]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[concat(parameters('storagePrefix'), uniqueString(parameters('secondSubscriptionID'), parameters('secondResourceGroup')))]",
+                    "type": "abc"
+                },
+
+                // outofbounds1.json
+                {
+                    "name": "[parameters('vmNames')[0]]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[concat(parameters('vmProperties')[copyIndex()].name,'Deployment')]",
+                    "type": "abc"
+                },
+                {
+                    "name": "[concat(parameters('projectName'),'sqlsrv/',variables('rdsDBName'))]",
+                    "type": "abc"
+                }
+            ]
+        }
+    ],
+    "outputs": {}
+}

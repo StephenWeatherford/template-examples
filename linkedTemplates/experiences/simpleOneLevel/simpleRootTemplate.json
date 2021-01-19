@@ -3,14 +3,14 @@
     "contentVersion": "1.0.0.0",
     "resources": [
         {
-            "name": "linkedDeployment1",
+            "name": "nestedDeployment1",
             "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2019-10-01",
+            "apiVersion": "2017-05-10",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/StephenWeatherford/template-examples/master/linkedTemplates/contentVersions/linked.json"
-                }
+                    "relativePath": "abc.json"  
+                } 
             }
         }
     ]

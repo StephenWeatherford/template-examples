@@ -151,8 +151,7 @@
             "apiVersion": "2019-12-01",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[concat(parameters('vmName'),copyIndex(1),'pip')]"
-            ],
+                "[concat(parameters('vmName'),copyIndex(1),'pip')]"            ],
             "properties": {
                 "ipConfigurations": [
                     {
@@ -235,7 +234,7 @@
                     "location": "[resourceGroup().location]",
                     "condition": "[not(empty(parameters('dscFunction')))]",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Compute/virtualMachines/extensions', concat(parameters('vmName'),copyIndex(1),'/dscext'))]"
+                        "[resourceId('Microsoft.Compute/virtualMachines/extensions', concat(parameters('vmName'),copyIndex(1),'/dscext'))]"                        
                     ],
                     "properties": {
                         "publisher": "Microsoft.Powershell",

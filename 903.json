@@ -1,0 +1,15 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "functions": [],
+    "variables": {
+        "v1": "name-from-template(staging)",
+        "expectedv2": "[parametersname-from-template(staging)",
+        "actualv2": "[parameters-from-template(staging)",
+
+        "v3": "[paramname-from-template(staging)",
+    },
+    "resources": [],
+    "outputs": {}
+}

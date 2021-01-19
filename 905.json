@@ -1,0 +1,69 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "p1": {
+            "type": "string",
+            "defaultValue": "outer"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "InfVNET01Template",
+            "resourceGroup": "[parameters('p1')]",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "p1": {
+                        "type": "string",
+                        "defaultValue": "inner"
+                    }
+                },
+                "expressionEvaluationOptions": {
+                    "scope": "inner"
+                },
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "p1": {
+                            "type": "string",
+                            "defaultValue": "inner"
+                        }
+                    },
+                    "variables": {},
+                    "resources": [
+                        {
+                            "name": "[[parameters('p1').name]",
+                            "type": "Microsoft.Network/virtualNetworks",
+                            "apiVersion": "2019-04-01",
+                            "location": "[parameters('p1')]",
+                            //"tags": "[parameters('p1')]",
+                            "properties": {
+                                "addressSpace": {
+                                    "addressPrefixes": [
+                                        "[parameters('p1').addressPrefixes[0].addressPrefix]"
+                                    ]
+                                },
+                                "copy": [
+                                    {
+                                        "name": "subnets",
+                                        "count": 1,
+                                        "input": {
+                                            "name": "[parameters('p1')[copyIndex('subnets')].name]",
+                                            "properties": {
+                                                "addressPrefix": "[parameters('p1')[copyIndex('subnets')].addressPrefix]"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

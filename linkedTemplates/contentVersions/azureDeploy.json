@@ -13,7 +13,7 @@
                 "mode": "Incremental",
                 "templateLink": {
                     "uri": "https://raw.githubusercontent.com/StephenWeatherford/template-examples/master/linkedTemplates/contentVersions/linked.json",
-                    "contentVersion": "2.0.0.0"
+                    "contentVersion": "2.0.0.1"
                 },
                 "parameters": {
                 }

@@ -1,0 +1,29 @@
+// https://github.com/microsoft/vscode-azurearmtools/issues/600#issuecomment-616631029
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "rgNamePrefix": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "rgEnvList": {
+            "type": "array",
+            "allowedValues": [
+                "DEV",
+                "TEST",
+                "PROD"
+            ],
+            "defaultValue": []
+        },
+        "rgLocation": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "instanceCount": {
+            "type": "int",
+            "defaultValue": 2
+        }
+    },
+    "resources": []
+}

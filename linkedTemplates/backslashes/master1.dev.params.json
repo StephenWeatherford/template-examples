@@ -2,11 +2,8 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "loadBalancers_name": {
-            "value": "mylb"
-        },
-        "publicIPAddresses_name": {
-            "value": "myip"
+        "linkedTemplatesLocation": {
+            "value": "https://github.com/StephenWeatherford/template-examples/tree/master/linkedTemplates/twoLinked/templates"
         }
     }
 }

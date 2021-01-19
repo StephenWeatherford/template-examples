@@ -1,0 +1,68 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "functions": [],
+    "variables": {},
+    "resources": [ 
+{"name": "[parameter('a')]","type": "ms.abc/def"},
+{"name":"[parameterss('a')]", "type": "ms.abc/def"},
+{"name":"[parameters('a')]", "type": "ms.abc/def"},
+{"name":"[variables('a')]","type": "ms.abc/def"},
+{"name":"[(variables('a')+variables('abc'))]","type": "ms.abc/def"},
+
+// concat strings
+{"name":"[concat(a)]", "type": "ms.abc/def"},
+{"name":"[concat('a', 'b')]", "type": "ms.abc/def"},
+{"name":"[concat(variables('sqlServer'), 'a')]", "type": "ms.abc/def"},
+{"name":"[concat(variables('a'),'b',variables('abc'))]", "type": "ms.abc/def"},
+{"name":"[concat(variables('sqlServer'), '/', variables('firewallRuleName2'))]","type": "ms.abc/def"},
+
+// concat other things
+{"name":"[concat(a, 1)]", "type": "ms.abc/def"},
+{"name":"[concat('a', 1)]", "type": "ms.abc/def"},
+{"name":"[concat(1, 2)]", "type": "ms.abc/def"},
+
+// nested concat
+{"name":"[concat(concat(a))]", "type": "ms.abc/def"},
+
+//asdf child-resources/children-nested.json
+{"name":"AllowAllWindowsAzureIps", "type": "ms.abc/def"},
+{"name":"2019-06-01-preview", "type": "ms.abc/def"},
+{"name":"[resourceGroup().location]", "type": "ms.abc/def"},
+{"name":"[uniqueString(resourceGroup().id)]", "type": "ms.abc/def"},
+
+//asdf 101-sql-logical-server.json
+{"name":"Microsoft.Storage/storageAccounts/providers/roleAssignments","type": "ms.abc/def"},
+{"name":"[concat(variables('storageName'), '/Microsoft.Authorization/', variables('uniqueRoleGuid') )]", "type": "ms.abc/def"},
+{"name":"[resourceGroup().name]", "type": "ms.abc/def"},
+{"name":"[tolower(concat('sqlva', variables('uniqueStorage')))]", "type": "ms.abc/def"},
+
+// asdf copy-in-outputs3.json
+{"name":"[concat(parameters('rgNamePrefix'),'-',parameters('rgEnvList')[copyIndex()])]","type": "ms.abc/def"},
+{"name":"[concat('nic-', copyIndex())]", "type": "ms.abc/def"},
+{"name":"[array(json('[\"one\",\"two\",\"three\"]'))[copyIndex()]]", "type": "ms.abc/def"},
+
+{"name":"[if(parameters('globalRedundancy'), 'Standard_GRS', 'Standard_LRS')]", "type": "ms.abc/def"},
+{"name":"[format('{0}/default/logs', variables('storageAccountName'))]", "type": "ms.abc/def"},
+
+//asdf icons.json
+{"name":"[myFunctions.vmName(parameters('virtualMachineName'),copyindex(1))]", "type": "ms.abc/def"},
+{"name":"[myFunctions.diskName(parameters('virtualMachineName'),copyindex(1))]", "type": "ms.abc/def"},
+{"name":"[myFunctions.nicName(parameters('virtualMachineName'),copyindex(1))]","type": "ms.abc/def"},
+
+//asdf keyvalue-with-param.json
+{"name":"[concat('sql-', uniqueString(resourceGroup().id, 'sql'))]", "type": "ms.abc/def"},
+
+{"name":"[concat(parameters('storagePrefix'), uniqueString(resourceGroup().id))]", "type": "ms.abc/def"},
+{"name":"[concat(parameters('storagePrefix'), uniqueString(parameters('secondSubscriptionID'), parameters('secondResourceGroup')))]", "type": "ms.abc/def"},
+
+// outofbounds1.json
+{"name":"[parameters('vmNames')[0]]", "type": "ms.abc/def"},
+{"name":"[concat(parameters('vmProperties')[copyIndex()].name,'Deployment')]","type": "ms.abc/def"},
+{"name":"[concat(parameters('projectName'),'sqlsrv/',variables('rdsDBName'))]", "type": "ms.abc/def"},
+
+
+],
+    "outputs": {}
+}

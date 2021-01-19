@@ -1,0 +1,51 @@
+{
+  // https://github.com/microsoft/vscode-azurearmtools/issues/1128
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources": [
+    {
+      "type": "Microsoft.Resources/templateSpecs",
+      "apiVersion": "2019-06-01-preview",
+      "name": "test",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "description": "Sample",
+        "displayName": "Sample"
+      },
+      "resources": [
+        {
+          "type": "versions",
+          "apiVersion": "2019-06-01-preview",
+          "name": "1.0.0",
+          "properties": {
+            "description": "Sample",
+            "template": {
+              "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+              "contentVersion": "1.0.0.0",
+              "parameters": {
+                "name": {
+                  "type": "string"
+                }
+              },
+              "resources": [
+                {
+                  "apiVersion": "2018-02-01",
+                  "name": "[parameters('name')]",
+                  "type": "Microsoft.Resources/deployments",
+                  "properties": {
+                    "mode": "Incremental",
+                    "template": {
+                      "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                      "contentVersion": "1.0.0.0",
+                      "resources": []
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

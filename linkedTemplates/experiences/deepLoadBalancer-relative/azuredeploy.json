@@ -2,7 +2,7 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "_artifactsLocation": {  
+        "_artifactsLocation": {
             "type": "string",
             "metadata": {
                 "description": "The base URI where artifacts required by this template are located including a trailing '/'"
@@ -37,9 +37,37 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "relativePath": "[variables('linkedTemplates').loadBalancer]",    
+                    "relativepath": "linkedTemplates/public-ip-loadbalancer.json",
+                    "uri": "linkedTemplates/public-ip-loadbalancer.json"
                     // BUG: contentVersion doesn't match linked template's content version
                     //"contentVersion": "1.0.0.1"
+                },
+                "parameters": {
+                    // BUG: Misspelled parameter name
+                    "loadBalancers_name_whoops": {
+                        "value": "[parameters('loadBalancers_name')]"
+                    }
+                    /* BUG: missing required parameter
+                    "publicIPAddresses_name": {
+                        "value": "[parameters('publicIPAddresses_name')]"
+                    }
+                    */,
+                    "loadBalancers_location": {
+                        // BUG: Incorrect parameter type, should be string
+                        "value": "[variables('intVar')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "linkedDeployment2",
+            "type": "Microsoft.Resources/deployments2",   
+            "apiVersion": "2019-10-01",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "relativepath": "linkedTemplates/public-ip-loadbalancer.json",
+                    "uri": "linkedTemplates/public-ip-loadbalancer.json"
                 },
                 "parameters": {
                     // BUG: Misspelled parameter name
