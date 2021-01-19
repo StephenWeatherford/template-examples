@@ -12,8 +12,8 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "http://raw.githubusercontent.com/StephenWeatherford/template-examples/master/linkedTemplates/relativePath/child.json",
-                    //"relativePath": "child.json",
+                    //"uri": "http://raw.githubusercontent.com/StephenWeatherford/template-examples/master/linkedTemplates/relativePath/child.json",
+                    "relativePath": "child.json",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
