@@ -6,7 +6,8 @@
     "variables": {},
     "resources": [
         {
-            "name": "[uniqueString(resourceGroup().id, 'storageaccount1')]",
+            //"name": "[uniqueString(resourceGroup().id, 'storageaccount1')]",
+            "name": "gadhskladsfhl",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
             "tags": {
