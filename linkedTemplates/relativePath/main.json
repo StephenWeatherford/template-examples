@@ -12,7 +12,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "relativePath": "child.json",
+                    "relativePath": "child.json2",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
