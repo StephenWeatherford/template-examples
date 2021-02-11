@@ -14,11 +14,15 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "relativePath": "subfolder/child.json"
+                    "relativePath": "subfolder\\child.json"
                 }
             }
         }
     ],
     "outputs": {
+        "o": {
+            "type": "string",
+            "value": "[deployment().properties.templateLink.uri]"
+        }
     }
 }

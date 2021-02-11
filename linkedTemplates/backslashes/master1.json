@@ -4,31 +4,31 @@
     "parameters": {
         "linkedTemplatesLocation": {
             "type": "string",
-            "defaultValue": "https://github.com/StephenWeatherford/template-examples/tree/master/linkedTemplates/twoLinked/templates"
+            "defaultValue": "https://raw.githubusercontent.com/StephenWeatherford/template-examples/master/linkedTemplates/twoLinked/templates"            
         }
     },
     "variables": {
-        "firstTemplate": "../linkedTemplate1.json",
+        "firstTemplate": "linkedTemplate1.json",
         "secondTemplate": "linkedTemplate2.json"
     },
     "resources": [
-        {
-            "name": "nestedDeployment2",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2017-05-10",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(parameters('linkedTemplatesLocation'), '/', variables('secondTemplate'))]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "linked2param1": {
-                        "value": "abc"
-                    }
-                }
-            }
-        },
+        // {
+        //     "name": "nestedDeployment2",
+        //     "type": "Microsoft.Resources/deployments",
+        //     "apiVersion": "2017-05-10",
+        //     "properties": {
+        //         "mode": "Incremental",
+        //         "templateLink": {
+        //             "uri": "[concat(parameters('linkedTemplatesLocation'), '/', variables('secondTemplate'))]",
+        //             "contentVersion": "1.0.0.0"
+        //         },
+        //         "parameters": {
+        //             "linked2param1": {
+        //                 "value": "abc"
+        //             }
+        //         }
+        //     }
+        // },
         {
             "name": "nestedDeployment1",
             "type": "Microsoft.Resources/deployments",
@@ -39,9 +39,6 @@
                     "uri": "[concat(parameters('linkedTemplatesLocation'), '/', variables('firstTemplate'))]"
                 },
                 "parameters": {
-                    "linked1param1": {
-                        "value": "my value"
-                    }
                 }
             }
         }
