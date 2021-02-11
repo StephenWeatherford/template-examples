@@ -20,9 +20,5 @@
         }
     ],
     "outputs": {
-        "o2": {
-            "type": "string",
-            "value": "[deployment().properties.templateLink.uri]"
-        }
     }
 }
