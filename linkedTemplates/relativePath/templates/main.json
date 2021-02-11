@@ -6,7 +6,8 @@
             "type": "string",
             "metadata": {
                 "description": "description"
-            }
+            },
+            "defaultValue": "none"
         }
     },
     "functions": [],
