@@ -22,7 +22,7 @@
     "outputs": {
         "o2": {
             "type": "string",
-            "value": "[deployment().properties.uri]"
+            "value": "[deployment().properties.templateLink.uri]"
         }
     }
 }
