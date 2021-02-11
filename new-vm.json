@@ -238,7 +238,7 @@
         {
             "name": "[concat('shutdown-computevm-', parameters('virtualMachineName'))]",
             "type": "Microsoft.DevTestLab/labs/schedules", // CHANGED FROM "Microsoft.DevTestLab/schedules"
-            "apiVersion": "2017-04-26-preview",
+            "apiVersion": "2018-09-15",
             "location": "[parameters('location')]",
             "properties": {
                 "status": "[parameters('autoShutdownStatus')]",
@@ -250,7 +250,7 @@
                 "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]",
                 "notificationSettings": {
                     "status": "[parameters('autoShutdownNotificationStatus')]",
-                    "timeInMinutes": "30"
+                    "timeInMinutes": 30
                 }
             },
             "dependsOn": [
