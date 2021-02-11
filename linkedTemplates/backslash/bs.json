@@ -19,5 +19,10 @@
             }
         }
     ],
-    "outputs": {}
+    "outputs": {
+        "o": {
+            "type": "string",
+            "value": "[deployment().location]"
+        }
+    }
 }
