@@ -22,7 +22,7 @@
     "outputs": {
         "o": {
             "type": "string",
-            "value": "[deployment().location]"
+            "value": "[deployment().properties.location]"
         }
     }
 }
