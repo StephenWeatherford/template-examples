@@ -5,5 +5,10 @@
     "functions": [],
     "variables": {},
     "resources": [],
-    "outputs": {}
+    "outputs": {
+        "o1": {
+            "value": "child 2",
+            "type": "string"
+        }
+    }
 }
