@@ -1,0 +1,90 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+            "name": "string",
+            "type": "microsoft.insights/autoscalesettings",
+            "apiVersion": "2015-04-01",
+            "location": "string",
+            "tags": {},
+            "properties": {
+                "profiles": [
+                    {
+                        "name": "string",
+                        "capacity": {
+                            "minimum": "string",
+                            "maximum": "string",
+                            "default": "string"
+                        },
+                        "rules": [
+                            {
+                                "metricTrigger": {
+                                    "metricName": "string",
+                                    "metricResourceUri": "string",
+                                    "timeGrain": "string",
+                                    "statistic": "string",
+                                    "timeWindow": "string",
+                                    "timeAggregation": "string",
+                                    "operator": "string",
+                                    "threshold": "number"
+                                },
+                                "scaleAction": {
+                                    "direction": "string",
+                                    "type": "string",
+                                    "value": "string",
+                                    "cooldown": "string"
+                                }
+                            }
+                        ],
+                        "fixedDate": {
+                            "timeZone": "string",
+                            "start": "string",
+                            "end": "string"
+                        },
+                        "recurrence": {
+                            "frequency": "string",
+                            "schedule": {
+                                "timeZone": "string",
+                                "days": [
+                                    "string"
+                                ],
+                                "hours": [
+                                    "integer"
+                                ],
+                                "minutes": [
+                                    "integer"
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "notifications": [
+                    {
+                        "operation": "Scale",
+                        "email": {
+                            "sendToSubscriptionAdministrator": "boolean",
+                            "sendToSubscriptionCoAdministrators": "boolean",
+                            "customEmails": [
+                                "string"
+                            ]
+                        },
+                        "webhooks": [
+                            {
+                                "serviceUri": "string",
+                                "properties": {}
+                            }
+                        ]
+                    }
+                ],
+                "enabled": "boolean",
+                "name": "string",
+                "targetResourceUri": "string"
+            }
+        }
+    ],
+    "outputs": {}
+}

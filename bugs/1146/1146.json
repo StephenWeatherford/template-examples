@@ -1,0 +1,913 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "subscriptionId": {
+            "type": "string"
+        },
+        "resourceGroupName": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "sqlPoolServerName": {
+            "type": "string"
+        },
+        "synapseDatabaseName": {
+            "type": "string"
+        },
+        "workspaceName": {
+            "type": "string"
+        },
+        "lookback": {
+            "type": "string",
+            "defaultValue": "30m"
+        },
+        "lookbackDescription": {
+            "type": "string",
+            "defaultValue": "Past 30 minutes"
+        },
+        "dashboardName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "queryTop20LongestRunningQueries": "[concat('let databaseName = ''',parameters('synapseDatabaseName'),''';\r\nAzureDiagnostics\r\n| where Category == ''ExecRequests''\r\n| where Resource =~ databaseName\r\n| where StatementType_s !in (''Batch'', ''Execute'')\r\n| summarize Session_ID=any(SessionId_s),\r\n Request_ID=any(RequestId_s),\r\n Submit_Time=max(SubmitTime_t),\r\n Start_Time=max(StartTime_t),\r\n End_Time=max(EndTime_t),\r\n Command=any(Command_s),\r\n Status=min(Status_s), //This works because Completed/Failed/Cancelled are all below running, below suspended. This happens to work out where the min is the current status\r\n Statement_Type=any(StatementType_s),\r\n Resource_class=any(ResourceClass_s)\r\n by RequestId_s\r\n| summarize ElapsedTime_min=anyif((End_Time - Start_Time) / 1m, Start_Time > ago(30d)), Session_ID=any(Session_ID), Submit_Time=any(Submit_Time), Start_Time=any(Start_Time), End_Time=any(End_Time), Command=any(Command), Status=any(Status), Statement_Type=any(Statement_Type), Resource_class=any(Resource_class) by Request_ID\r\n| order by ElapsedTime_min desc\r\n| limit 20\n')]",
+        "queryQueriesWithMostDataMoved": "[concat('let databaseName = ''',parameters('synapseDatabaseName'),''';\r\n//Most rows moved by Step\r\nAzureDiagnostics\r\n| where Category == ''RequestSteps''\r\n| where Resource =~ databaseName\r\n| extend elapsedTime = EndTime_t - StartTime_t\r\n| extend elapsedTime_min = elapsedTime/1m\r\n// | where EndTime_t > ago(7d)\r\n// | where StartTime_t > ago(7d)\r\n| order by RowCount_d desc\r\n| project RequestId_s, OperationType_s, RowCount_d,elapsedTime_min , StartTime_t, EndTime_t, Status_s\r\n| limit 20\n')]",
+        "queryRowsProcessedPastMinute": "[concat('let databaseName = ''',parameters('synapseDatabaseName'),''';\r\n//rows processed per minute\r\nAzureDiagnostics\r\n| where Category == ''RequestSteps''\r\n| where Resource =~ databaseName\r\n| where RowCount_d > 0\r\n| summarize Rows_Processed=sum(RowCount_d) by bin(TimeGenerated, 1m)\r\n| sort by TimeGenerated desc\r\n| limit 50\r\n| render timechart \n')]"
+    },
+    "resources": [
+        {
+            "properties": {
+                "lenses": {
+                    "0": {
+                        "order": 0,
+                        "parts": {
+                            "0": {
+                                "position": {
+                                    "x": 0,
+                                    "y": 0,
+                                    "colSpan": 6,
+                                    "rowSpan": 3
+                                },
+                                "metadata": {
+                                    "inputs": [
+                                        {
+                                            "name": "sharedTimeRange",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "options",
+                                            "value": {
+                                                "chart": {
+                                                    "metrics": [
+                                                        {
+                                                            "resourceMetadata": {
+                                                                "id": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Sql/servers/',parameters('sqlpoolservername'),'/databases/',parameters('synapseDatabaseName'))]"
+                                                            },
+                                                            "name": "cpu_percent",
+                                                            "aggregationType": 3,
+                                                            "namespace": "microsoft.sql/servers/databases",
+                                                            "metricVisualization": {
+                                                                "displayName": "CPU percentage"
+                                                            }
+                                                        },
+                                                        {
+                                                            "resourceMetadata": {
+                                                                "id": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Sql/servers/',parameters('sqlpoolservername'),'/databases/',parameters('synapseDatabaseName'))]"
+                                                            },
+                                                            "name": "dwu_consumption_percent",
+                                                            "aggregationType": 3,
+                                                            "namespace": "microsoft.sql/servers/databases",
+                                                            "metricVisualization": {
+                                                                "displayName": "DWU percentage"
+                                                            }
+                                                        },
+                                                        {
+                                                            "resourceMetadata": {
+                                                                "id": "[concat('/subscriptions/',parameters('subscriptionId'),'resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Sql/servers/',parameters('sqlpoolservername'),'/databases/',parameters('synapseDatabaseName'))]"
+                                                            },
+                                                            "name": "physical_data_read_percent",
+                                                            "aggregationType": 3,
+                                                            "namespace": "microsoft.sql/servers/databases",
+                                                            "metricVisualization": {
+                                                                "displayName": "Data IO percentage"
+                                                            }
+                                                        }
+                                                    ],
+                                                    "title": "[concat('Max CPU percentage, Max DWU percentage, and Max Data IO percentage for',parameters('sqlPoolServerName'))]",
+                                                    "titleKind": 1,
+                                                    "visualization": {
+                                                        "chartType": 2,
+                                                        "legendVisualization": {
+                                                            "isVisible": true,
+                                                            "position": 2,
+                                                            "hideSubtitle": false
+                                                        },
+                                                        "axisVisualization": {
+                                                            "x": {
+                                                                "isVisible": true,
+                                                                "axisType": 2
+                                                            },
+                                                            "y": {
+                                                                "isVisible": true,
+                                                                "axisType": 1
+                                                            }
+                                                        }
+                                                    },
+                                                    "timespan": {
+                                                        "relative": {
+                                                            "duration": 86400000
+                                                        },
+                                                        "showUTCTime": false,
+                                                        "grain": 1
+                                                    }
+                                                }
+                                            },
+                                            "isOptional": true
+                                        }
+                                    ],
+                                    "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+                                    "settings": {
+                                        "content": {
+                                            "options": {
+                                                "chart": {
+                                                    "metrics": [
+                                                        {
+                                                            "resourceMetadata": {
+                                                                "id": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Sql/servers/',parameters('sqlpoolservername'),'/databases/',parameters('synapseDatabaseName'))]"
+                                                            },
+                                                            "name": "cpu_percent",
+                                                            "aggregationType": 3,
+                                                            "namespace": "microsoft.sql/servers/databases",
+                                                            "metricVisualization": {
+                                                                "displayName": "CPU percentage"
+                                                            }
+                                                        },
+                                                        {
+                                                            "resourceMetadata": {
+                                                                "id": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Sql/servers/',parameters('sqlpoolservername'),'/databases/',parameters('synapseDatabaseName'))]"
+                                                            },
+                                                            "name": "dwu_consumption_percent",
+                                                            "aggregationType": 3,
+                                                            "namespace": "microsoft.sql/servers/databases",
+                                                            "metricVisualization": {
+                                                                "displayName": "DWU percentage"
+                                                            }
+                                                        },
+                                                        {
+                                                            "resourceMetadata": {
+                                                                "id": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Sql/servers/',parameters('sqlpoolservername'),'/databases/',parameters('synapseDatabaseName'))]"
+                                                            },
+                                                            "name": "physical_data_read_percent",
+                                                            "aggregationType": 3,
+                                                            "namespace": "microsoft.sql/servers/databases",
+                                                            "metricVisualization": {
+                                                                "displayName": "Data IO percentage"
+                                                            }
+                                                        }
+                                                    ],
+                                                    "title": "Resource Utilization",
+                                                    "titleKind": 2,
+                                                    "visualization": {
+                                                        "chartType": 2,
+                                                        "legendVisualization": {
+                                                            "isVisible": true,
+                                                            "position": 2,
+                                                            "hideSubtitle": false
+                                                        },
+                                                        "axisVisualization": {
+                                                            "x": {
+                                                                "isVisible": true,
+                                                                "axisType": 2
+                                                            },
+                                                            "y": {
+                                                                "isVisible": true,
+                                                                "axisType": 1
+                                                            }
+                                                        },
+                                                        "disablePinning": true
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "1": {
+                                "position": {
+                                    "x": 6,
+                                    "y": 0,
+                                    "colSpan": 6,
+                                    "rowSpan": 3
+                                },
+                                "metadata": {
+                                    "inputs": [
+                                        {
+                                            "name": "sharedTimeRange",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "options",
+                                            "value": {
+                                                "chart": {
+                                                    "metrics": [
+                                                        {
+                                                            "resourceMetadata": {
+                                                                "id": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Sql/servers/',parameters('sqlpoolservername'),'/databases/',parameters('synapseDatabaseName'))]"
+                                                            },
+                                                            "name": "active_queries",
+                                                            "aggregationType": 1,
+                                                            "namespace": "microsoft.sql/servers/databases",
+                                                            "metricVisualization": {
+                                                                "displayName": "Active queries"
+                                                            }
+                                                        },
+                                                        {
+                                                            "resourceMetadata": {
+                                                                "id": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Sql/servers/',parameters('sqlpoolservername'),'/databases/',parameters('synapseDatabaseName'))]"
+                                                            },
+                                                            "name": "queued_queries",
+                                                            "aggregationType": 1,
+                                                            "namespace": "microsoft.sql/servers/databases",
+                                                            "metricVisualization": {
+                                                                "displayName": "Queued queries"
+                                                            }
+                                                        }
+                                                    ],
+                                                    "title": "Active and Queued queries - Concurrency details",
+                                                    "titleKind": 2,
+                                                    "visualization": {
+                                                        "chartType": 1,
+                                                        "legendVisualization": {
+                                                            "isVisible": true,
+                                                            "position": 2,
+                                                            "hideSubtitle": false
+                                                        },
+                                                        "axisVisualization": {
+                                                            "x": {
+                                                                "isVisible": true,
+                                                                "axisType": 2
+                                                            },
+                                                            "y": {
+                                                                "isVisible": true,
+                                                                "axisType": 1
+                                                            }
+                                                        }
+                                                    },
+                                                    "timespan": {
+                                                        "relative": {
+                                                            "duration": 86400000
+                                                        },
+                                                        "showUTCTime": false,
+                                                        "grain": 1
+                                                    }
+                                                }
+                                            },
+                                            "isOptional": true
+                                        }
+                                    ],
+                                    "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+                                    "settings": {
+                                        "content": {
+                                            "options": {
+                                                "chart": {
+                                                    "metrics": [
+                                                        {
+                                                            "resourceMetadata": {
+                                                                "id": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Sql/servers/',parameters('sqlpoolservername'),'/databases/',parameters('synapseDatabaseName'))]"
+                                                            },
+                                                            "name": "active_queries",
+                                                            "aggregationType": 1,
+                                                            "namespace": "microsoft.sql/servers/databases",
+                                                            "metricVisualization": {
+                                                                "displayName": "Active queries"
+                                                            }
+                                                        },
+                                                        {
+                                                            "resourceMetadata": {
+                                                                "id": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Sql/servers/',parameters('sqlpoolservername'),'/databases/',parameters('synapseDatabaseName'))]"
+                                                            },
+                                                            "name": "queued_queries",
+                                                            "aggregationType": 1,
+                                                            "namespace": "microsoft.sql/servers/databases",
+                                                            "metricVisualization": {
+                                                                "displayName": "Queued queries"
+                                                            }
+                                                        }
+                                                    ],
+                                                    "title": "Active and Queued queries - Concurrency details",
+                                                    "titleKind": 2,
+                                                    "visualization": {
+                                                        "chartType": 1,
+                                                        "legendVisualization": {
+                                                            "isVisible": true,
+                                                            "position": 2,
+                                                            "hideSubtitle": false
+                                                        },
+                                                        "axisVisualization": {
+                                                            "x": {
+                                                                "isVisible": true,
+                                                                "axisType": 2
+                                                            },
+                                                            "y": {
+                                                                "isVisible": true,
+                                                                "axisType": 1
+                                                            }
+                                                        },
+                                                        "disablePinning": true
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "2": {
+                                "position": {
+                                    "x": 0,
+                                    "y": 3,
+                                    "colSpan": 6,
+                                    "rowSpan": 3
+                                },
+                                "metadata": {
+                                    "inputs": [
+                                        {
+                                            "name": "sharedTimeRange",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "options",
+                                            "value": {
+                                                "chart": {
+                                                    "metrics": [
+                                                        {
+                                                            "resourceMetadata": {
+                                                                "id": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Sql/servers/',parameters('sqlpoolservername'),'/databases/',parameters('synapseDatabaseName'))]"
+                                                            },
+                                                            "name": "wlg_allocation_relative_to_system_percent",
+                                                            "aggregationType": 3,
+                                                            "namespace": "microsoft.sql/servers/databases",
+                                                            "metricVisualization": {
+                                                                "displayName": "Workload group allocation by system percent"
+                                                            }
+                                                        }
+                                                    ],
+                                                    "title": "Workload Group Allocation",
+                                                    "titleKind": 2,
+                                                    "visualization": {
+                                                        "chartType": 2,
+                                                        "legendVisualization": {
+                                                            "isVisible": true,
+                                                            "position": 2,
+                                                            "hideSubtitle": false
+                                                        },
+                                                        "axisVisualization": {
+                                                            "x": {
+                                                                "isVisible": true,
+                                                                "axisType": 2
+                                                            },
+                                                            "y": {
+                                                                "isVisible": true,
+                                                                "axisType": 1
+                                                            }
+                                                        }
+                                                    },
+                                                    "grouping": {
+                                                        "dimension": "WorkloadGroupName",
+                                                        "sort": 2,
+                                                        "top": 10
+                                                    },
+                                                    "timespan": {
+                                                        "relative": {
+                                                            "duration": 86400000
+                                                        },
+                                                        "showUTCTime": false,
+                                                        "grain": 1
+                                                    }
+                                                }
+                                            },
+                                            "isOptional": true
+                                        }
+                                    ],
+                                    "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+                                    "settings": {
+                                        "content": {
+                                            "options": {
+                                                "chart": {
+                                                    "metrics": [
+                                                        {
+                                                            "resourceMetadata": {
+                                                                "id": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Sql/servers/',parameters('sqlpoolservername'),'/databases/',parameters('synapseDatabaseName'))]"
+                                                            },
+                                                            "name": "wlg_allocation_relative_to_system_percent",
+                                                            "aggregationType": 3,
+                                                            "namespace": "microsoft.sql/servers/databases",
+                                                            "metricVisualization": {
+                                                                "displayName": "Workload group allocation by system percent"
+                                                            }
+                                                        }
+                                                    ],
+                                                    "title": "Workload Group Allocation",
+                                                    "titleKind": 2,
+                                                    "visualization": {
+                                                        "chartType": 2,
+                                                        "legendVisualization": {
+                                                            "isVisible": true,
+                                                            "position": 2,
+                                                            "hideSubtitle": false
+                                                        },
+                                                        "axisVisualization": {
+                                                            "x": {
+                                                                "isVisible": true,
+                                                                "axisType": 2
+                                                            },
+                                                            "y": {
+                                                                "isVisible": true,
+                                                                "axisType": 1
+                                                            }
+                                                        },
+                                                        "disablePinning": true
+                                                    },
+                                                    "grouping": {
+                                                        "dimension": "WorkloadGroupName",
+                                                        "sort": 2,
+                                                        "top": 10
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "3": {
+                                "position": {
+                                    "x": 6,
+                                    "y": 3,
+                                    "colSpan": 6,
+                                    "rowSpan": 3
+                                },
+                                "metadata": {
+                                    "inputs": [
+                                        {
+                                            "name": "sharedTimeRange",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "options",
+                                            "value": {
+                                                "chart": {
+                                                    "metrics": [
+                                                        {
+                                                            "resourceMetadata": {
+                                                                "id": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Sql/servers/',parameters('sqlpoolservername'),'/databases/',parameters('synapseDatabaseName'))]"
+                                                            },
+                                                            "name": "local_tempdb_usage_percent",
+                                                            "aggregationType": 3,
+                                                            "namespace": "microsoft.sql/servers/databases",
+                                                            "metricVisualization": {
+                                                                "displayName": "Local tempdb percentage"
+                                                            }
+                                                        }
+                                                    ],
+                                                    "title": "Tempdb Utilization",
+                                                    "titleKind": 2,
+                                                    "visualization": {
+                                                        "chartType": 2,
+                                                        "legendVisualization": {
+                                                            "isVisible": true,
+                                                            "position": 2,
+                                                            "hideSubtitle": false
+                                                        },
+                                                        "axisVisualization": {
+                                                            "x": {
+                                                                "isVisible": true,
+                                                                "axisType": 2
+                                                            },
+                                                            "y": {
+                                                                "isVisible": true,
+                                                                "axisType": 1
+                                                            }
+                                                        }
+                                                    },
+                                                    "timespan": {
+                                                        "relative": {
+                                                            "duration": 1800000
+                                                        },
+                                                        "showUTCTime": false,
+                                                        "grain": 1
+                                                    }
+                                                }
+                                            },
+                                            "isOptional": true
+                                        }
+                                    ],
+                                    "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+                                    "settings": {
+                                        "content": {
+                                            "options": {
+                                                "chart": {
+                                                    "metrics": [
+                                                        {
+                                                            "resourceMetadata": {
+                                                                "id": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Sql/servers/',parameters('sqlpoolservername'),'/databases/',parameters('synapseDatabaseName'))]"
+                                                            },
+                                                            "name": "local_tempdb_usage_percent",
+                                                            "aggregationType": 3,
+                                                            "namespace": "microsoft.sql/servers/databases",
+                                                            "metricVisualization": {
+                                                                "displayName": "Local tempdb percentage"
+                                                            }
+                                                        }
+                                                    ],
+                                                    "title": "Tempdb Utilization",
+                                                    "titleKind": 2,
+                                                    "visualization": {
+                                                        "chartType": 2,
+                                                        "legendVisualization": {
+                                                            "isVisible": true,
+                                                            "position": 2,
+                                                            "hideSubtitle": false
+                                                        },
+                                                        "axisVisualization": {
+                                                            "x": {
+                                                                "isVisible": true,
+                                                                "axisType": 2
+                                                            },
+                                                            "y": {
+                                                                "isVisible": true,
+                                                                "axisType": 1
+                                                            }
+                                                        },
+                                                        "disablePinning": true
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "4": {
+                                "position": {
+                                    "x": 0,
+                                    "y": 6,
+                                    "colSpan": 12,
+                                    "rowSpan": 3
+                                },
+                                "metadata": {
+                                    "inputs": [
+                                        {
+                                            "name": "resourceTypeMode",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "ComponentId",
+                                            "value": {
+                                                "SubscriptionId": "[parameters('subscriptionId')]",
+                                                "ResourceGroup": "[parameters('resourceGroupName')]",
+                                                "Name": "[parameters('workspaceName')]",
+                                                "ResourceId": "[resourceId(parameters('subscriptionId'),parameters('resourceGroupName'), 'microsoft.operationalinsights/workspaces', parameters('workspaceName'))]"
+                                            },
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "Scope",
+                                            "value": {
+                                                "resourceIds": [
+                                                    "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Sql/servers/',parameters('sqlpoolservername'),'/databases/',parameters('synapseDatabaseName'))]"
+                                                ]
+                                            },
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "Dimensions",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "PartId",
+                                            "value": "77579cf6-0b22-4748-a200-f67b7c7591c6",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "Version",
+                                            "value": "2.0",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "TimeRange",
+                                            "value": "PT1H",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "DashboardId",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "DraftRequestParameters",
+                                            "value": {
+                                                "scope": "hierarchy"
+                                            },
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "Query",
+                                            "value": "[variables('queryTop20LongestRunningQueries')]",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "ControlType",
+                                            "value": "AnalyticsGrid",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "SpecificChart",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "PartTitle",
+                                            "value": "Analytics",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "PartSubTitle",
+                                            "value": "",
+                                            "isOptional": true
+                                        }
+                                    ],
+                                    "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+                                    "settings": {
+                                        "content": {
+                                            "PartTitle": "Top 20 Longest Running Queries",
+                                            "PartSubTitle": "Lookback duration set in query - edit to change"
+                                        }
+                                    }
+                                }
+                            },
+                            "5": {
+                                "position": {
+                                    "x": 0,
+                                    "y": 9,
+                                    "colSpan": 6,
+                                    "rowSpan": 4
+                                },
+                                "metadata": {
+                                    "inputs": [
+                                        {
+                                            "name": "resourceTypeMode",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "ComponentId",
+                                            "value": {
+                                                "SubscriptionId": "[parameters('subscriptionId')]",
+                                                "ResourceGroup": "[parameters('resourceGroupName')]",
+                                                "Name": "[parameters('workspaceName')]",
+                                                "ResourceId": "[resourceId(parameters('subscriptionId'),parameters('resourceGroupName'), 'microsoft.operationalinsights/workspaces', parameters('workspaceName'))]"
+                                            },
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "Scope",
+                                            "value": {
+                                                "resourceIds": [
+                                                    "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Sql/servers/',parameters('sqlpoolservername'),'/databases/',parameters('synapseDatabaseName'))]"
+                                                ]
+                                            },
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "Dimensions",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "PartId",
+                                            "value": "14706ed7-0a4a-4e06-9662-75ab25587417",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "Version",
+                                            "value": "2.0",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "TimeRange",
+                                            "value": "P1D",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "DashboardId",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "DraftRequestParameters",
+                                            "value": {
+                                                "scope": "hierarchy"
+                                            },
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "Query",
+                                            "value": "[variables('queryQueriesWithMostDataMoved')]",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "ControlType",
+                                            "value": "AnalyticsGrid",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "SpecificChart",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "PartTitle",
+                                            "value": "Analytics",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "PartSubTitle",
+                                            "value": "",
+                                            "isOptional": true
+                                        }
+                                    ],
+                                    "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+                                    "settings": {
+                                        "content": {
+                                            "PartTitle": "Who moved my data? Query steps with most moved data",
+                                            "PartSubTitle": "Lookback duration set in query - edit to change"
+                                        }
+                                    }
+                                }
+                            },
+                            "6": {
+                                "position": {
+                                    "x": 6,
+                                    "y": 9,
+                                    "colSpan": 6,
+                                    "rowSpan": 4
+                                },
+                                "metadata": {
+                                    "inputs": [
+                                        {
+                                            "name": "resourceTypeMode",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "ComponentId",
+                                            "value": {
+                                                "SubscriptionId": "[parameters('subscriptionId')]",
+                                                "ResourceGroup": "[parameters('resourceGroupName')]",
+                                                "Name": "[parameters('workspaceName')]",
+                                                "ResourceId": "[resourceId(parameters('subscriptionId'),parameters('resourceGroupName'), 'microsoft.operationalinsights/workspaces', parameters('workspaceName'))]"
+                                            },
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "Scope",
+                                            "value": {
+                                                "resourceIds": [
+                                                    "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Sql/servers/',parameters('sqlpoolservername'),'/databases/',parameters('synapseDatabaseName'))]"
+                                                ]
+                                            },
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "Dimensions",
+                                            "value": {
+                                                "xAxis": {
+                                                    "name": "TimeGenerated",
+                                                    "type": "datetime"
+                                                },
+                                                "yAxis": [
+                                                    {
+                                                        "name": "Rows_Processed",
+                                                        "type": "real"
+                                                    }
+                                                ],
+                                                "splitBy": [],
+                                                "aggregation": "Sum"
+                                            },
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "PartId",
+                                            "value": "02a251e1-5e7e-480c-9811-82e897d14537",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "Version",
+                                            "value": "2.0",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "TimeRange",
+                                            "value": "P1D",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "DashboardId",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "DraftRequestParameters",
+                                            "value": {
+                                                "scope": "hierarchy"
+                                            },
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "Query",
+                                            "value": "[variables('queryRowsProcessedPastMinute')]",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "ControlType",
+                                            "value": "FrameControlChart",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "SpecificChart",
+                                            "value": "Line",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "PartTitle",
+                                            "value": "Analytics",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "PartSubTitle",
+                                            "value": "",
+                                            "isOptional": true
+                                        }
+                                    ],
+                                    "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+                                    "settings": {
+                                        "content": {
+                                            "PartTitle": "Rows processed past minute",
+                                            "PartSubTitle": "Lookback duration set in query - edit to change"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "metadata": {
+                    "model": {
+                        "timeRange": {
+                            "value": {
+                                "relative": {
+                                    "duration": 24,
+                                    "timeUnit": 1
+                                }
+                            },
+                            "type": "MsPortalFx.Composition.Configuration.ValueTypes.TimeRange"
+                        },
+                        "filterLocale": {
+                            "value": "en-us"
+                        },
+                        "filters": {
+                            "value": {
+                                "MsPortalFx_TimeRange": {
+                                    "model": {
+                                        "format": "utc",
+                                        "granularity": "auto",
+                                        "relative": "[parameters('lookback')]"
+                                    },
+                                    "displayCache": {
+                                        "name": "UTC Time",
+                                        "value": "[parameters('lookbackDescription')]"
+                                    },
+                                    "filteredPartIds": [
+                                        "StartboardPart-MonitorChartPart-7fc2cdc5-5edb-45a9-8623-1ba7777bea7b",
+                                        "StartboardPart-MonitorChartPart-7fc2cdc5-5edb-45a9-8623-1ba7777bea92",
+                                        "StartboardPart-MonitorChartPart-7fc2cdc5-5edb-45a9-8623-1ba7777beaac",
+                                        "StartboardPart-MonitorChartPart-7fc2cdc5-5edb-45a9-8623-1ba7777beaca",
+                                        "StartboardPart-LogsDashboardPart-f2627a68-46e5-46a3-a6cf-42887658f23e",
+                                        "StartboardPart-LogsDashboardPart-f2627a68-46e5-46a3-a6cf-42887658f2cc",
+                                        "StartboardPart-LogsDashboardPart-f2627a68-46e5-46a3-a6cf-42887658f319"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "name": "[parameters('dashboardName')]",
+            "type": "Microsoft.Portal/dashboards",
+            "location": "[parameters('location')]",
+            "tags": {
+                "hidden-title": "[parameters('dashboardName')]"
+            },
+            "apiVersion": "2015-08-01-preview"
+        }
+    ],
+    "outputs": {
+        "resourceID": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Portal/dashboards', parameters('dashboardName'))]"
+        }
+    }
+}
