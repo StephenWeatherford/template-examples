@@ -20,9 +20,9 @@
         }
     ],
     "outputs": {
-        "o": {
+        "o2": {
             "type": "string",
-            "value": "[deployment().properties.location]"
+            "value": "[deployment().properties.uri]"
         }
     }
 }
