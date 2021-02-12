@@ -1,0 +1,31 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.2.3.4",
+    "variables": {
+        "stringValue": "abc",
+        "nestedDeployment2Name": "nestedDeployment2",
+        "mode": "Incremental"
+    },
+    "resources": [
+        {
+            "name": "[variables('nestedDeployment2Name')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "properties": {
+                "mode": "[variables('mode')]",
+                "templateLink": {
+                    // THESE REFER TO THE TOP-LEVEL PARAMS/VARS
+                    "uri": "https://abc.foo",
+                    "contentVersion": "4.3.2.1"
+                },
+                "parameters": {
+                    "linked2param1": {
+                        "value": "[variables('stringValue')]"
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {},
+    "functions": []
+}
