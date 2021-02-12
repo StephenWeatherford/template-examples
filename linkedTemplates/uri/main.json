@@ -1,0 +1,23 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+            "name": "linkedDeployment1",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "https://sawdeploy.blob.core.windows.net/sawdeploy/bs.json?sv=2019-12-12&si=sawdeploy&sr=c&sig=SzLJFWrlZqbeKTCb4UXtPWuO64yu9Fv2McMjpX%2FqG9A%3D"
+                },
+                "parameters": {
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}
