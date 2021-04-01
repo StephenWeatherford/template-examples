@@ -1,9 +1,27 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {},
+    "parameters": {
+        "gitHubFolder": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            },
+            "defaultValue": "https://raw.githubusercontent.com/StephenWeatherford/template-examples/master/linkedTemplates/uri"
+        },
+        "templateLocation": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        }
+    },
     "functions": [],
-    "variables": {},
+    "variables": {
+        "separator": "/",
+        "child1": "child.json",
+        "urichild": "child.json"
+    },
     "resources": [
         {
             "name": "linkedDeployment1",
@@ -12,9 +30,52 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/StephenWeatherford/template-examples/master/linkedTemplates/uri/child.json"
+                    "uri": "https://raw.githubusercontent.com/StephenWeatherford/template-examples/master/linkedTemplates/uri/child.json",
+                    "contentVersion": "3.0.0.0"
                 },
                 "parameters": {
+                    "parameter1": {
+                        "value": "a" // TODO: Fill in parameter value
+                    },
+                    "parameter2": {
+                        "value": 0 // TODO: Fill in parameter value
+                    },
+                    "rgName": {
+                        "value": "a" // TODO: Fill in parameter value
+                    }
+                }
+            }
+        },
+        {
+            "name": "nestedDeployment1",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                    "parameter1": {
+                        "value": "" // TODO: Fill in parameter value
+                    }
+                },
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "parameter1": {
+                            "type": "string",
+                            "metadata": {
+                                "description": "description"
+                            }
+                        }
+                    },
+                    "variables": {
+                        "variable1": "[parameters('parameter1')]"
+                    },
+                    "resources": [],
+                    "outputs": {}
                 }
             }
         }
