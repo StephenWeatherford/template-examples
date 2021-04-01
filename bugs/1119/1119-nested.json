@@ -1,0 +1,42 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+            "name": "nestedDeployment1",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                    "intParam": {
+                        "value": "0" // TODO: Fill in parameter value
+                    }
+                },
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "intParam": {
+                            "type": "int",
+                            "metadata": {
+                                "description": "description"
+                            }
+                        }
+                    },
+                    "functions": [],
+                    "variables": {},
+                    "resources": [],
+                    "outputs": {}
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}
