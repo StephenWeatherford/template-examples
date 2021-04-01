@@ -1,0 +1,27 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environmentName": {
+            "type": "string",
+            "allowedValues": [ "Development", "Test", "Production" ],
+            "minLength": 4,
+            "defaultValue": "[resourceGroup().tags['Environment']]",
+            "metadata": {
+                "description": "Name of environment.  To be used in resource names.  By default, this value will be inherted by the resource group's environment tag if available."
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "someTag": "[resourceGroup().tags['SomeTag']]",
+        "defaultValue": "[resourceGroup().tags['Environment']]"
+    },
+    "resources": [],
+    "outputs": {
+        "environment": {
+            "type": "string",
+            "value": "[resourceGroup().tags['Environment']]"
+        }
+    }
+}
