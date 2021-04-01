@@ -1,0 +1,95 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "functions": [],
+    "variables": {
+        "ipSecurityRestrictions": [
+        {
+            "ipAddress": "127.0.0.1/32",
+            "name": "No place like localhost"
+        }],
+        "scmIpSecurityRestrictions": [
+        {
+            "ipAddress": "127.0.0.1/32",
+            "name": "No place like localhost"
+        }]
+    },
+    "resources": [{
+      "type": "Microsoft.Web/sites/config",
+      "name": "test",
+      "apiVersion": "2018-11-01",
+      "location": "West Europe",
+      "tags": {},
+      "properties": {
+        "numberOfWorkers": 1,
+        "defaultDocuments": [
+          "Default.htm",
+          "Default.html",
+          "Default.asp",
+          "index.htm",
+          "index.html",
+          "iisstart.htm",
+          "default.aspx",
+          "index.php"
+        ],
+        "copy": [
+          {
+            "name": "ipSecurityRestrictions",
+            "count": "[length(variables('ipSecurityRestrictions'))]",
+            "input": {
+              "ipAddress": "[variables('ipSecurityRestrictions')[copyIndex('ipSecurityRestrictions')].ipAddress]",
+              "name": "[variables('ipSecurityRestrictions')[copyIndex('ipSecurityRestrictions')].name]",
+              "priority": "[mul(add(copyIndex('ipSecurityRestrictions'), 1), 100)]"
+            }
+          },
+          {
+            "name": "scmIpSecurityRestrictions",
+            "count": "[length(variables('scmIpSecurityRestrictions'))]",
+            "input": {
+              "ipAddress": "[variables('scmIpSecurityRestrictions')[copyIndex('scmIpSecurityRestrictions')].ipAddress]",
+              "name": "[variables('scmIpSecurityRestrictions')[copyIndex('scmIpSecurityRestrictions')].name]",
+              "priority": "[mul(add(copyIndex('scmIpSecurityRestrictions'), 1), 100)]"
+            }
+          }
+        ],
+        "scmIpSecurityRestrictionsUseMain": false,
+        "netFrameworkVersion": "v4.6",
+        "phpVersion": "5.6",
+        "pythonVersion": "",
+        "nodeVersion": "",
+        "linuxFxVersion": "",
+        "logsDirectorySizeLimit": 35,
+        "scmType": "None",
+        "use32BitWorkerProcess": true,
+        "alwaysOn": true,
+        "appCommandLine": "",
+        "managedPipelineMode": "Integrated",
+        "virtualApplications": [
+          {
+            "virtualPath": "/",
+            "physicalPath": "site\\wwwroot",
+            "preloadEnabled": true
+          }
+        ],
+        "loadBalancing": "LeastRequests",
+        "routingRules": [],
+        "experiments": {
+          "rampUpRules": []
+        },
+        "vnetName": "",
+        "cors": {
+          "allowedOrigins": [
+            "https://functions.azure.com",
+            "https://functions-staging.azure.com",
+            "https://functions-next.azure.com"
+          ]
+        },
+        "minTlsVersion": "1.0"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', 'test')]"
+      ]
+    }],
+    "outputs": {}
+}
