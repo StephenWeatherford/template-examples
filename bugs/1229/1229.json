@@ -1,0 +1,31 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "parameter1": { // top-level parameter1 definition in main template
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        }
+    },
+    "resources": [
+        {
+            "name": "linkedDeployment1",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "relativePath": "childTemplate.json",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "parameter1": { // Value for parameter1 of linked template  <<<<<<<<<<< CLICK ON parameter1 HERE
+                        "value": "[parameters('parameter1')]" // Reference to top-level parameter1 in main template
+                    }
+                }
+            }
+        }
+    ]
+}

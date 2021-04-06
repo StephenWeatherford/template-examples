@@ -1,0 +1,18 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "parameter1": { // parameter1 definition in child template
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "variable1": "[parameters('parameter1')]" // Use of parameter1 in linked template
+    },
+    "resources": [],
+    "outputs": {}
+}
