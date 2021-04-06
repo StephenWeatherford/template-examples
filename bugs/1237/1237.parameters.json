@@ -4,6 +4,9 @@
     "parameters": {
         "parameter1": {
             "value": "param1 in params file"
+        },
+        "parameter2": {
+            "value": "" // TODO: Fill in parameter value
         }
     }
 }
