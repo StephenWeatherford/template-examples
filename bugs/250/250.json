@@ -1,0 +1,88 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "outputs": {
+        ///////////////////////////////////////////////////////////////////////
+        // 1: Starts with [ but doesn't end with ] -> it is an unchanged string
+        "output1a": {
+            "type": "string",
+            "value": "[one]two" // -> string: "[one]two" 
+        },
+        "output1b": {
+            "type": "string",
+            "value": "[one]two" // -> string: "[one]two"
+        },
+        "output1c": {
+            "type": "string",
+            "value": "[abc]withsuffix" // -> string: "[abc]withsuffix"
+        },
+        "output1d": {
+            "type": "string",
+            "value": "[Preview]: Audit VMs with insecure password security settings" // -> string: "[Preview]: Audit VMs with insecure password security settings"
+        },
+        "output1e": {
+            "type": "string",
+            "value": "[abc" // -> string: "[abc"
+        },
+        "output1f": {
+            "type": "string",
+            "value": "[[one]two" // -> string: "[[one]two"
+        },
+
+        ///////////////////////////////////////////////////////////////////////
+        // 2: Starts with [[ but doesn't end with ] -> it is an (unchanged) string
+        "output2a": {
+            "type": "string",
+            "value": "[[abc" // -> string: "[[abc"
+        },
+        "output2b": {
+            "type": "string",
+            "value": "[[[abc" // -> string:  "[[[abc"
+        },
+
+        ///////////////////////////////////////////////////////////////////////
+        // 3: Starts with [[ and ends with ] -> replace the first [, it is a string
+        "output3a": {
+            "type": "string",
+            "value": "[[one]" // -> string: "[one]"
+        },
+        "output3b": {
+            "type": "string",
+            "value": "[[one]two]" // -> string: "[one]two]"
+        },
+        "output3c": {
+            "type": "string",
+            "value": "[[[one]two]" // -> string: "[[one]two]"
+        },
+        "output3d": {
+            "type": "string",
+            "value": "[[[abc]" // -> string:  "[[abc]"
+        },
+
+        ///////////////////////////////////////////////////////////////////////
+        // 4: Starts with [ and ends with ] with no whitespace before or after -> it is an expression
+        "output4a": {
+            "type": "string",
+            "value": "[concat('')]" // -> expression: ""
+        },
+
+        ///////////////////////////////////////////////////////////////////////
+        // 5: Anything else is a string
+        "output5a": {
+            "type": "string",
+            "value": " [one]" // Starts with whitespace -> string: " [one]"
+        },
+        "output5b": {
+            "type": "string",
+            "value": "[one] " // Ends with whitespace -> string: "[one] "
+        },
+        
+        ///////////////////////////////////////////////////////////////////////
+        // 6: Incomplete strings
+        "output6a": {
+            "type": "string",
+            "value": "this is a string value" 
+        }
+    },
+    "resources": []
+}
