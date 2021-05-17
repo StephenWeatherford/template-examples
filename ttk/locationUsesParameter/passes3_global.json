@@ -6,7 +6,7 @@
     "parameters": {
         "location": {
             "type": "string",
-            "defaultValue": "global"
+            "defaultValue": "[concat(1,1)]"
         }
     },
     "resources": [
