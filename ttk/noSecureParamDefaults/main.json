@@ -1,0 +1,58 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.3.255.40792",
+      "templateHash": "608448964173451387"
+    }
+  },
+  "parameters": {
+    "psNoDefault": {
+      "type": "secureString"
+    },
+    "psEmpty": {
+      "type": "secureString",
+      "defaultValue": ""
+    },
+    "psNotEmpty": {
+      // Parameter psNotEmpty is a SecureString and must not have a default value unless it is an expression that contains the newGuid() function.
+      "type": "secureString",
+      "defaultValue": "not allowed"
+    },
+    "psExpression": {
+      // Parameter psExpression is a SecureString and must not have a default value unless it is an expression that contains the newGuid() function.
+      "type": "secureString",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "psNewGuid": {
+      "type": "secureString",
+      "defaultValue": "[newGuid()]"
+    },
+    "psContainsNewGuid": {
+      // Parameter psContainsNewGuid is a SecureString and must not have a default value unless it is an expression that contains the newGuid() 
+      "type": "secureString",
+      "defaultValue": "[concat(format('{0}{1}', parameters('psEmpty'), newGuid()), '')]"
+    },
+    "pi1": {
+      "type": "int",
+      "defaultValue": 1
+    },
+    "poNoDefault": {
+      "type": "secureObject"
+    },
+    "poEmpty": {
+      "type": "secureObject",
+      "defaultValue": {}
+    },
+    "poNotEmpty": {
+      "type": "secureObject",
+      "defaultValue": {
+        "abc": 1
+      }
+    }
+  },
+  "functions": [],
+  "resources": []
+}
