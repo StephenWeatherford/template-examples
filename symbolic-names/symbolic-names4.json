@@ -1,0 +1,73 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+            "name": "nestedDeployment1",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "properties": {
+                "mode": "Incremental",
+                "expressionEvaluationOptions": {
+                    "scope": "Inner"
+                },
+                "template": {
+                    "$schema": "https: //schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "updateTag": {
+                            "type": "string",
+                            "defaultValue": "[utcNow()]"
+                        }
+                    },
+                    "resources": {
+                        "script1": {
+                            "type": "Microsoft.Resources/deploymentScripts",
+                            "name": "brownbagScript11",
+                            "apiVersion": "2020-10-01",
+                            "location": "[resourceGroup().location]",
+                            "kind": "AzurePowerShell",
+                            "properties": {
+                                "azPowerShellVersion": "5.5",
+                                "scriptContent": "param([string] $textToEcho) \nWrite-Output $textToEcho \n$DeploymentScriptOutputs = @{} \n$DeploymentScriptOutputs['text'] = $textToEcho",
+                                "Arguments": "\"Hello World\"",
+                                "timeout": "PT30M",
+                                "retentionInterval": "PT1H",
+                                "cleanupPreference": "Always",
+                                "forceUpdateTag": "[parameters('updateTag')]"
+                            }
+                        },
+                        "script2": {
+                            "type": "Microsoft.Resources/deploymentScripts",
+                            "name": "brownbagScript22",
+                            "apiVersion": "2020-10-01",
+                            "location": "[resourceGroup().location]",
+                            "kind": "AzurePowerShell",
+                            "dependsOn": [
+                                "script1"
+                            ],
+                            "properties": {
+                                "azPowerShellVersion": "5.5",
+                                "scriptContent": "param([string] $textToEcho) \nWrite-Output $textToEcho \n$DeploymentScriptOutputs['text'] = $textToEcho",
+                                "Arguments": "[reference('script1').outputs.text]",
+                                "timeout": "PT30M",
+                                "retentionInterval": "PT1H",
+                                "cleanupPreference": "Always",
+                                "forceUpdateTag": "[parameters('updateTag')]"
+                            }
+                        }
+                    },
+                    "outputs": {
+                        "result": {
+                            "value": "[reference('script2').outputs.text]",
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
