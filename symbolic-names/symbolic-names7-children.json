@@ -1,0 +1,155 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the new Vnet"
+            }
+        },
+        "vnetAddressSpace": {
+            "type": "string",
+            "metadata": {
+                "description": "Vnet CIDR address space"
+            }
+        },
+        "region": {
+            "type": "string",
+            "metadata": {
+                "description": "Lowercase region into which the Vnet should be defined"
+            }
+        },
+        "gatewaySubnetAddressPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "String containing the gateway subnet address"
+            }
+        },
+        "subnets": {
+            "type": "array",
+            "metadata": {
+                "description": "Array containing subnet values for the new Vnet"
+            }
+        },
+        "NsgExpressRouteName": {
+            "type": "string",
+            "defaultValue": "[concat('NsgExpressRoute', parameters('vnetName'))]",
+            "metadata": {
+                "description": "Example: NsgExpressRouteEastUS"
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "name": "[parameters('NsgExpressRouteName')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "location": "[parameters('region')]",
+            "apiVersion": "2019-04-01",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "ExpressRoute",
+                        "properties": {
+                            "access": "Allow",
+                            "description": "Required to permit inbound traffic from Express Route NAT IPs",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "*",
+                            "direction": "Inbound",
+                            "priority": 100,
+                            "protocol": "*",
+                            "sourceAddressPrefixes": [
+                                "1.1.1.1",
+                                "1.1.1.2",
+                                "1.1.1.3",
+                                "1.1.1.4"
+                            ],
+                            "sourcePortRange": "*"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[parameters('vnetName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "location": "[parameters('region')]",
+            "apiVersion": "2019-04-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups/',parameters('NsgExpressRouteName'))]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('vnetAddressSpace')]"
+                    ]
+                },
+                "dhcpOptions": {
+                    "dnsServers": [
+                        "172.16.1.1",
+                        "172.16.1.2",
+                        "172.16.1.3",
+                        "172.16.1.4"
+                    ]
+                },
+                "copy": [
+                    {
+                        "name": "subnets",
+                        "count": "[length(parameters('subnets'))]",
+                        "input": {
+                            "name": "[parameters('subnets')[copyIndex('subnets')].name]",
+                            "properties": {
+                                "addressPrefix": "[parameters('subnets')[copyIndex('subnets')].addressprefix]",
+                                "networkSecurityGroup": {
+                                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('NsgExpressRouteName'))]"
+                                },
+                                "serviceEndpoints": [
+                                    {
+                                        "service": "Microsoft.Sql"
+                                    },
+                                    {
+                                        "service": "Microsoft.KeyVault"
+                                    },
+                                    {
+                                        "service": "Microsoft.Storage"
+                                    },
+                                    {
+                                        "service": "Microsoft.AzureActiveDirectory"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "resources": [
+                {
+                    "name": "GatewaySubnet",
+                    "type": "subnets",
+                    "location": "[parameters('region')]",
+                    "apiVersion": "2019-04-01",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/virtualNetworks/',parameters('vnetName'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[parameters('gatewaySubnetAddressPrefix')]"
+                    }
+                }
+            ]
+        }
+    ],
+    "outputs": {
+        "NewVnetResourceId": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Network/virtualNetworks',parameters('vnetName'))]"
+        }
+    }
+}
