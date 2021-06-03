@@ -1,0 +1,35 @@
+{
+    "$schema": "http://schemas.management.azure.com/deploymentTemplate?api-version=2014-04-01-preview",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "variables": {},
+    "resources": {
+        "Symbol1": {
+            "name": "[concat('testResource1', copyIndex())]",
+            "type": "ResourceProviderTestHost/TestResourceType1",
+            "apiVersion": "2020-06-01",
+            "location": "DevFabric",
+            "properties": {
+                "testProperty": "testValue"
+            },
+            "copy": {
+                "name": "testCopy",
+                "count": 2
+            }
+        },
+        "Symbol2": {
+            "name": "[concat(resourceInfo('Symbol1')[copyIndex()].name, copyIndex())]",
+            "type": "ResourceProviderTestHost/TestResourceType2",
+            "scope": "[resourceInfo('Symbol1')[copyIndex()].id]",
+            "apiVersion": "[resourceInfo('Symbol1')[copyIndex()].apiVersion]",
+            "location": "DevFabric",
+            "properties": {
+                "testProperty": "testValue"
+            },
+            "copy": {
+                "name": "testCopy",
+                "count": 2
+            }
+        }
+    }
+}
