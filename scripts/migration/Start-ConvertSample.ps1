@@ -1,8 +1,5 @@
 param(
-    # [string] $BicepSampleName = "101/azure-search-create",
-    # [string] $QuickStartSampleName = "quickstarts/microsoft.search/azure-search-create",
     [string][Parameter(Mandatory = $true)] $BicepSampleName, # e.g. "101/sample"
-    [string][Parameter(Mandatory = $true)] $QuickStartSampleName, # the name of the sample or folder path from the root of the repo e.g. "quickstarts/ms.abc/sample"
     [string] $ReposRoot = "~/repos",
     [string] $PrPrefix = "sw" #asdf
 )
@@ -11,8 +8,8 @@ $ErrorActionPreference = "Stop"
 
 Import-Module "$PSScriptRoot/ConvertSamples.psm1" -Force
 $bicepFolder = getBicepFolder $ReposRoot $BicepSampleName
-$quickStartFolder = getQuickStartFolder $ReposRoot $QuickStartSampleName
-$bicepCommand = GetBicepCommand $ReposRootx
+$row, $QuickStartSampleName, $quickStartMoved = FindQuickStartFromBicepExample $BicepSampleName -ThrowIfNotFound
+$QuickStartFolder = GetQuickStartFolder $ReposRoot $quickStartSampleName
 
 Write-Host "Bicep repo..."
 cd $bicepFolder
@@ -25,7 +22,8 @@ git checkout -b $PrPrefix/$BicepSampleName
 ThrowIfExternalCmdFailed "Creating new branch failed"
 
 CreateBicepMovedReadme $bicepFolder
-
+cd $bicepFolder
+git add .
 git commit --allow-empty -m "Sync with quickstart: $QuickStartSampleName"
 
 Write-Host "QuickStart repo..."
@@ -40,6 +38,6 @@ ThrowIfExternalCmdFailed "Creating new branch failed"
 
 Write-Host "Preparing initial main.bicep in bicep repo..."
 write-host "bicep decompile $QuickStartFolder/azuredeploy.json --outfile $BicepFolder/main.bicep"
-& $bicepCommand decompile $QuickStartFolder/azuredeploy.json --outfile $BicepFolder/main.bicep
+vi decompile $QuickStartFolder/azuredeploy.json --outfile $BicepFolder/main.bicep
 
 code $BicepFolder/main.bicep $QuickStartFolder/azuredeploy.json

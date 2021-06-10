@@ -14,17 +14,15 @@ param(
     [string]$TableName = "QuickStartsMetadataService",
     $ResultDeploymentLastTestDateParameter = "PublicLastTestDate", # sort based on the cloud we're testing (FairfaxLastTestDate or PublicLastTestDate)
     $ResultDeploymentParameter = "PublicDeployment", # PublicDeployment or FairfaxDeployment
-    $OutputFilename = "~/bicepsamples"
+    $OutputFilename = "~/Business/bicepsamples"
 )
 
 $currentFolder = Get-Location
 try {
+    Import-Module "$PSScriptRoot/ConvertSamples.psm1" -Force
+    CheckOut $ReposRoot/bicep main
 
-    # Get the storage table that contains the "status" for the deployment/test results
-    $ctx = (Get-AzStorageAccount -Name $StorageAccountName -ResourceGroupName $StorageAccountResourceGroupName).Context
-
-    $cloudTable = (Get-AzStorageTable –Name $tableName –Context $ctx).CloudTable
-    $t = Get-AzTableRow -table $cloudTable
+    $t = GetQuickStartTable
 
     # # Get all the quickstart samples from disk
     # $ArtifactFilePaths = Get-ChildItem $QuickStartsRepoPath\metadata.json -Recurse -File | ForEach-Object -Process { $_.FullName }
@@ -46,55 +44,45 @@ try {
         $folder = split-path $bicepPath -Parent
         $level = split-path (Split-Path $folder -Parent) -Leaf # This is the name of the parent folder ("101", "201", etc.)
         $sampleShortName = Split-Path $folder -Leaf
-        $quickStartSampleName = "$level-$sampleShortName"
         $bicepSampleName = "$level/$sampleShortName"
-        $bicepFolder = "docs/examples/$level/$sampleShortName"
+        $bicepRelativeFolder = "docs/examples/$level/$sampleShortName"
 
         Set-Location (Split-Path -Parent $bicepPath)
         $sampleAuthor = & git log  --pretty=format:'%an' $bicepPath | tail -1 # Author who checked in the first version of the example
 
-        $quickStartMoved = $false
-
-        # First use the full bicep sample name matching exactly against the old full quickstart name, which includes the "level",
-        # e.g. "201-vm" (before being reorganized into new folder structures)
-        $r = $t | Where-Object { $_.RowKey -eq $quickStartSampleName }
-        if ($null -eq $r) {
-            # Next, try against the new, reorganized quickstarts, e.g. application-workloads@active-directory@active-directory-new-domain
-            # In this case, we match without the level, and must match the full leaf name
-            Write-Host $sampleShortName
-            $r = $t | Where-Object { $_.RowKey -like "*@" + $sampleShortName }
-            if ($r -and ($r.RowKey -is [string])) {
-                $quickStartSampleName = $r.RowKey.Replace("@", "/")
-                $quickStartMoved = $true
+        # Does the bicep example have the migration readme?
+        $bicepConverted = $false
+        $exampleReadmeFn = "$folder/README-MOVED.md"
+        if (Test-Path $exampleReadmeFn) {
+            $exampleReadme = Get-Content $exampleReadmeFn
+            if ($exampleReadme -like "*This sample has been moved*") {
+                $bicepConverted = $true
             }
         }
+
+        $r, $QuickStartSampleName, $quickStartMoved = FindQuickStartFromBicepExample $BicepSampleName $t
 
         if ($null -eq $r) {
             # No match found with quickstarts            
 
             $row = [PSCustomObject]@{
-                Name               = $bicepSampleName
-                Status             = ""
-                IsBicepQuickStart  = ""
-                BicepAuthor        = ""
-                QuickStartAuthor   = ""
+                Totals              = ""
+                Name                = $bicepSampleName
+                Status              = "Not a QuickStart"
+                QuickStartConverted = $IsBicepQuickStart
+                BicepConverted      = $bicepConverted
+                BicepAuthor         = ""
+                QuickStartAuthor    = ""
                 #BicepPath          = $bicepFolder
-                BestPracticeResult = ""
+                BestPracticeResult  = ""
                 #FairfaxDeployment  = ""
-                PublicDeployment   = ""
-                QuickStartUri      = ""
-                BicepUri           = ""
-                QuickStartMoved    = ""
+                PublicDeployment    = ""
+                BicepUri            = ""
+                QuickStartUri       = ""
+                QuickStartMoved     = ""
             } 
         }
         else {
-            if ($r -is [array]) {
-                throw "Found multiple matches for $bicepSampleName"
-            }
-            if (!($r.RowKey -is [string])) {
-                throw "RowKey $r.RowKey is not a string"
-            }
-
             # It matches a single quick-start entry in the table
             $BestPracticeResultOk = $r.BestPracticeResult -eq "PASS"
             #$FairfaxDeploymentOk = $r.FairfaxDeployment -ne "FAIL"
@@ -106,39 +94,61 @@ try {
             if (!$ReadyToConvert -and !$Failed) {
                 throw "Quickstart sample not ready to convert, but didn't find what failed"
             }
-            $Status = $IsBicepQuickStart ? "DONE" : $ReadyToConvert ? "CONVERT" : "Failed: $($failed | Join-String -Separator ', ')"
+            if ($IsBicepQuickStart -and $bicepConverted) {
+                $Status = "DONE"
+            }
+            elseif ($IsBicepQuickStart) {
+                $Status = "IN PROGRESS: Quickstart converted"
+            }
+            elseif ($bicepConverted) {
+                $Status = "IN PROGRESS: Example converted"
+            }
+            else {
+                $Status = $ReadyToConvert ? "Ready To Convert" : "Failed: $($failed | Join-String -Separator ', ')"
+            }
 
             $row = [PSCustomObject]@{
-                Name               = $bicepSampleName
-                Status             = $Status
-                IsBicepQuickStart  = $IsBicepQuickStart
-                BicepAuthor        = $sampleAuthor
-                QuickStartAuthor   = $r.GitHubUserName
+                Totals              = ""
+                Name                = $bicepSampleName
+                Status              = $Status
+                QuickStartConverted = $IsBicepQuickStart
+                BicepConverted      = $bicepConverted
+                BicepAuthor         = $sampleAuthor
+                QuickStartAuthor    = $r.GitHubUserName
                 #BicepPath          = $bicepFolder
-                BestPracticeResult = $r.BestPracticeResult
+                BestPracticeResult  = $r.BestPracticeResult
                 #FairfaxDeployment  = $r.FairfaxDeployment
-                PublicDeployment   = $r.PublicDeployment
-                QuickStartUri      = "https://github.com/Azure/azure-quickstart-templates/tree/master/$quickStartSampleName"
-                BicepUri           = "https://github.com/Azure/bicep/tree/main/$bicepFolder"
-                QuickStartMoved    = $quickStartMoved
+                PublicDeployment    = $r.PublicDeployment
+                BicepUri            = "https://github.com/Azure/bicep/tree/main/$bicepFolder"
+                QuickStartUri       = "https://github.com/Azure/azure-quickstart-templates/tree/master/$quickStartSampleName"
+                QuickStartMoved     = $quickStartMoved
             }
         }
 
         $outputRows += $row
-        Write-Output $row | fl * 
+        #Write-Output $row | fl * 
     }
 }
 finally {
     Set-Location $currentFolder
 }
 
-$outputCsv = ([io.path]::ChangeExtension($OutputFilename,"csv"))
-$outputRows | Export-Csv $outputCsv
+$sorted = $outputRows | Sort-Object -Property @{Expression = "Status"; Descending = $false }, "Name"
+$statuses = $outputRows | select -Property "Status" -Unique
+
+foreach ($status in $statuses) {
+    $matching = $outputRows | Where-Object { $_.Status -eq $status.Status }
+    $sorted = @{ Totals = "$($status): $($matching.Length)" } + $sorted
+}
+$sorted = @{ Totals = "Total: $($outputRows.Length)" } + $sorted
+
+$outputCsv = ([io.path]::ChangeExtension($OutputFilename, "csv"))
+$sorted | Export-Csv $outputCsv
 Write-Host "Wrote data to $outputCsv"
 
-# Need to do `install-module importexcel`
-$outputXls = ([io.path]::ChangeExtension($OutputFilename,"xls"))
-$outputRows | Export-Excel $outputXls
+# Need to do `install-module importexcel` if Export-Excel not found
+$outputXls = ([io.path]::ChangeExtension($OutputFilename, "xls"))
+$sorted | Export-Excel $outputXls
 Write-Host "Wrote data to $outputXls"
 
 & $outputXls

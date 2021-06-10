@@ -66,7 +66,7 @@ The bicep examples are being integrated into the [Azure QuickStart Template repo
 This sample has been moved to https://github.com/Azure/azure-quickstart-templates/tree/master/$QuickStartSampleName.
 
 It will also remain here as reference for the time being.
-"@ | Out-File $bicepFolder/README.md
+"@ | Out-File $bicepFolder/README-MOVED.md
 }
 
 function UpdateBicepBaseline {
@@ -85,6 +85,7 @@ function CheckOut {
         [switch] $New
     )
 
+    cd $RepoPath
     if ($New) {
         git checkout -b $Branch
         ThrowIfExternalCmdFailed "Checkout of new branch $Branch failed"
@@ -94,3 +95,70 @@ function CheckOut {
         ThrowIfExternalCmdFailed "Checkout of $Branch failed"
     }
 }
+
+function GetQuickStartTable {
+    param(
+        [string]$StorageAccountName = "azurequickstartsservice",
+        [string]$StorageAccountResourceGroupName = "azure-quickstarts-service-storage",
+        [string]$TableName = "QuickStartsMetadataService"
+    )
+
+    # Get the storage table that contains the "status" for the deployment/test results
+    $ctx = (Get-AzStorageAccount -Name $StorageAccountName -ResourceGroupName $StorageAccountResourceGroupName).Context
+
+    $cloudTable = (Get-AzStorageTable –Name $tableName –Context $ctx).CloudTable
+    $t = Get-AzTableRow -table $cloudTable
+    return $t
+}
+
+function FindQuickStartFromBicepExample {
+    param (
+        [string][Parameter(Mandatory = $true)] $bicepSampleName,
+        [object] $Table,
+        [switch] $ThrowIfNotFound
+    )
+
+    if (!$Table) {
+        $Table = GetQuickStartTable
+    }
+
+    $quickStartMoved = $false
+
+    $level = split-path (Split-Path $bicepSampleName -Parent) -Leaf # This is the name of the parent folder ("101", "201", etc.)
+    $sampleShortName = Split-Path $bicepSampleName -Leaf
+    $quickStartSampleName = "$level-$sampleShortName"
+
+    # First use the full bicep sample name matching exactly against the old full quickstart name, which includes the "level",
+    # e.g. "201-vm" (before being reorganized into new folder structures)
+    $r = $Table | Where-Object { $_.RowKey -eq $quickStartSampleName }
+    if ($null -eq $r) {
+        # Next, try against the new, reorganized quickstarts, e.g. application-workloads@active-directory@active-directory-new-domain
+        # In this case, we match without the level, and must match the full leaf name
+        Write-Host "Found quickstart sample: $quickStartSampleName"
+        $r = $Table | Where-Object { $_.RowKey -like "*@" + $sampleShortName }
+        if ($r -and ($r.RowKey -is [string])) {
+            $quickStartSampleName = $r.RowKey.Replace("@", "/")
+            $quickStartMoved = $true
+            Write-Host "Found quickstart sample: $quickStartSampleName"
+        }
+    }
+
+    if ($null -eq $r) {
+        if ($ThrowIfNotFound) {
+            throw "Could not find a quickstart sample for Bicep example $bicepSampleName"
+        }
+
+        return $null, $null, $null
+    }
+    else {
+        if ($r -is [array]) {
+            throw "Found multiple matches for $bicepSampleName"
+        }
+        if (!($r.RowKey -is [string])) {
+            throw "RowKey $r.RowKey is not a string"
+        }
+    }
+
+    return $r, $quickStartSampleName, $quickStartMoved
+}
+    
