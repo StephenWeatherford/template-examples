@@ -1,0 +1,22 @@
+{
+    "analyzers": {
+        "core": {
+            "enabled": true,
+            "verbose": false,
+            "rules": {
+                "no-unused-params": {
+                    "level": "off"
+                },
+                // "prefer-interpolation": {
+                //     "level": "warning"
+                // },
+                "secure-paramenter-default": {
+                    "level": "error"
+                },
+                "simplify-interpolation": {
+                    "level": "warning"
+                }
+            }
+        }
+    }
+}

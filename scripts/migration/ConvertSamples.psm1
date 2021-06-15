@@ -25,14 +25,14 @@ function GetQuickStartFolder {
 }
 
 function GetBicepCommand {
-    [OutputType([string])]
+    [OutputType([string[]])]
     param (
         [string]$ReposRoot
     )
 
-    $path = "src/Bicep.Cli/bin/Debug/net5.0/bicep.dll"
+    $path = "$ReposRoot/bicep/src/Bicep.Cli/bin/Debug/net5.0/bicep.dll"
     if (Test-Path $path) {
-        return "dotnet $path";
+        return "dotnet", (Resolve-Path $path)
     }
 
     return "bicep"
@@ -74,7 +74,8 @@ function UpdateBicepBaseline {
         [string][parameter(Mandatory = $true)] $ReposRoot
     )
 
-    cd "$ReposRoot/bicep"
+    Write-Host "Updating the bicep baseline (updating main.json to match main.bicep)"
+    cd "$ReposRoot/bicep/src/Bicep.Core.Samples"
     dotnet test --filter "TestCategory=Baseline&FullyQualifiedName~Bicep.Core.Samples" -- 'TestRunParameters.Parameter(name=\"SetBaseLine\", value=\"true\")'
 }
 
@@ -118,6 +119,8 @@ function FindQuickStartFromBicepExample {
         [switch] $ThrowIfNotFound
     )
 
+    Write-Host "Searching for quickstart sample matching bicep example $bicepSampleName..."
+
     if (!$Table) {
         $Table = GetQuickStartTable
     }
@@ -134,12 +137,10 @@ function FindQuickStartFromBicepExample {
     if ($null -eq $r) {
         # Next, try against the new, reorganized quickstarts, e.g. application-workloads@active-directory@active-directory-new-domain
         # In this case, we match without the level, and must match the full leaf name
-        Write-Host "Found quickstart sample: $quickStartSampleName"
         $r = $Table | Where-Object { $_.RowKey -like "*@" + $sampleShortName }
         if ($r -and ($r.RowKey -is [string])) {
             $quickStartSampleName = $r.RowKey.Replace("@", "/")
             $quickStartMoved = $true
-            Write-Host "Found quickstart sample: $quickStartSampleName"
         }
     }
 
@@ -148,9 +149,12 @@ function FindQuickStartFromBicepExample {
             throw "Could not find a quickstart sample for Bicep example $bicepSampleName"
         }
 
+        Write-Host "Found no matching quickstart samples."
         return $null, $null, $null
     }
     else {
+        Write-Host "Found quickstart sample: $quickStartSampleName"
+
         if ($r -is [array]) {
             throw "Found multiple matches for $bicepSampleName"
         }

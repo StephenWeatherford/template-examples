@@ -7,7 +7,7 @@ Matches bicep samples in the bicep repo with existing QuickStarts samples
 #>
 
 param(
-    [string]$BicepRepoPath = "~/repos/bicep",
+    [string]$ReposRoot = "~/repos",
     # [string]$QuickStartsRepoPath = "~/repos/azure-quickstart-templates",
     [string]$StorageAccountName = "azurequickstartsservice",
     [string]$StorageAccountResourceGroupName = "azure-quickstarts-service-storage",
@@ -16,6 +16,9 @@ param(
     $ResultDeploymentParameter = "PublicDeployment", # PublicDeployment or FairfaxDeployment
     $OutputFilename = "~/Business/bicepsamples"
 )
+
+$BicepRepoPath = "$ReposRoot/bicep"
+$QuickStartRepoPath = "$ReposRoot/azure-quickstart-templates"
 
 $currentFolder = Get-Location
 try {
@@ -34,7 +37,7 @@ try {
     # }
 
     # Get all the bicep samples
-    $BicepTemplateFilePaths = Get-ChildItem "$BicepRepoPath\docs\examples\main.bicep" -Recurse -File | ForEach-Object -Process { $_.FullName }
+    $BicepTemplateFilePaths = Get-ChildItem "$BicepRepoPath/docs/examples/main.bicep" -Recurse -File | ForEach-Object -Process { $_.FullName }
     Write-Host $BicepTemplateFilePaths
 
     $outputRows = @()
@@ -48,11 +51,17 @@ try {
         $bicepRelativeFolder = "docs/examples/$level/$sampleShortName"
 
         Set-Location (Split-Path -Parent $bicepPath)
-        $sampleAuthor = & git log  --pretty=format:'%an' $bicepPath | tail -1 # Author who checked in the first version of the example
+        $sampleAuthor = & git log --pretty=format:'%an' $bicepPath | tail -1 # Author who checked in the first version of the example
 
         # Does the bicep example have the migration readme?
         $bicepConverted = $false
         $exampleReadmeFn = "$folder/README-MOVED.md"
+        if (!(Test-Path $exampleReadmeFn)) {
+            $exampleReadmeFn = "$folder/README.md"
+        }
+        if (!(Test-Path $exampleReadmeFn)) {
+            $exampleReadmeFn = "$folder/readme.md"
+        }
         if (Test-Path $exampleReadmeFn) {
             $exampleReadme = Get-Content $exampleReadmeFn
             if ($exampleReadme -like "*This sample has been moved*") {
@@ -71,6 +80,8 @@ try {
                 Status              = "Not a QuickStart"
                 QuickStartConverted = $IsBicepQuickStart
                 BicepConverted      = $bicepConverted
+                BicepPR             = ""
+                QuickStartPR        = $null
                 BicepAuthor         = ""
                 QuickStartAuthor    = ""
                 #BicepPath          = $bicepFolder
@@ -111,8 +122,10 @@ try {
                 Totals              = ""
                 Name                = $bicepSampleName
                 Status              = $Status
-                QuickStartConverted = $IsBicepQuickStart
-                BicepConverted      = $bicepConverted
+                QuickStartConverted = $IsBicepQuickStart ? "QuickStart converted" : ""
+                BicepConverted      = $bicepConverted ? "Bicep converted" : ""
+                BicepPR             = ""
+                QuickStartPR        = $null
                 BicepAuthor         = $sampleAuthor
                 QuickStartAuthor    = $r.GitHubUserName
                 #BicepPath          = $bicepFolder
@@ -136,11 +149,49 @@ finally {
 $sorted = $outputRows | Sort-Object -Property @{Expression = "Status"; Descending = $false }, "Name"
 $statuses = $outputRows | select -Property "Status" -Unique
 
+cd $BicepRepoPath
+& gh pr list --label "bicep example migration" | Tee-Object -Variable prs
+$prs = $prs -split "`n`r"
+foreach ($pr in $prs) {
+    if ($pr -match "^([0-9]+).*([0-9][0-9][0-9]/[a-zA-Z0-9-]+)") {
+        $bicepPR = $matches[1]
+        $bicepSampleName = $matches[2]
+        $r = $outputRows | Where-Object { $_.Name -eq $bicepSampleName }
+        if (!$r) {
+            throw "Could not find bicep sample $bicepSampleName"
+        }
+
+        $r.BicepPR = "https://github.com/Azure/bicep/pull/$bicepPR"
+    }
+    else {
+        throw "Could not parse PR text: $pr"
+    }
+}
+
+cd $QuickStartRepoPath
+& gh pr list --label "bicep example migration" | Tee-Object -Variable prs
+$prs = $prs -split "`n`r"
+foreach ($pr in $prs) {
+    if ($pr -match "^([0-9]+).*([0-9][0-9][0-9]/[a-zA-Z0-9-]+)") {
+        $quickStartPR = $matches[1]
+        $bicepSampleName = $matches[2]
+        $r = $outputRows | Where-Object { $_.Name -eq $bicepSampleName }
+        if (!$r) {
+            throw "Could not find bicep sample $bicepSampleName"
+        }
+
+        $r.QuickStartPR = "https://github.com/Azure/azure-quickstart-templates/pull/$QuickStartPR"
+    }
+    else {
+        throw "Could not parse PR text: $pr"
+    }
+}
+
 foreach ($status in $statuses) {
     $matching = $outputRows | Where-Object { $_.Status -eq $status.Status }
-    $sorted = @{ Totals = "$($status): $($matching.Length)" } + $sorted
+    #$sorted = @( @{ Totals = "$($status): $($matching.Length)" } ) + $sorted
 }
-$sorted = @{ Totals = "Total: $($outputRows.Length)" } + $sorted
+#$sorted = @( @{ Totals = "Total: $($outputRows.Length)" } ) + $sorted
 
 $outputCsv = ([io.path]::ChangeExtension($OutputFilename, "csv"))
 $sorted | Export-Csv $outputCsv

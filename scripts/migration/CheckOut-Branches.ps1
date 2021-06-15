@@ -12,16 +12,11 @@ $row, $QuickStartSampleName, $quickStartMoved = FindQuickStartFromBicepExample $
 $QuickStartFolder = GetQuickStartFolder $ReposRoot $quickStartSampleName
 $bicepCommand = GetBicepCommand $ReposRoot
 
-Write-Host "Preparing initial bicep files in bicep repo..."
+Write-Host "Bicep: Checking out: $PrPrefix/$BicepSampleName"
 checkout $bicepFolder $PrPrefix/$BicepSampleName
-#write-host "bicep decompile $QuickStartFolder/azuredeploy.json --outfile $BicepFolder/main.bicep"
-cp $QuickStartFolder/azuredeploy.json $BicepFolder/main.json
-git add $BicepFolder/*.json
-git commit -m "Original JSON files from the quickstart sample"
-Write-Host "Decompiling main.json using bicep at: $bicepCommand"
-$params = $bicepCommand + @("decompile", "$BicepFolder/main.json")
-$cmd = $params[0]
-$params = $params[1..100] 
-start-process $cmd $params -wait
 
-code $BicepFolder/main.bicep $QuickStartFolder/azuredeploy.json
+Write-Host "QuickStarts: Checking out: $PrPrefix/$BicepSampleName"
+checkout $QuickStartFolder $PrPrefix/$BicepSampleName
+
+code $bicepFolder/main.bicep
+code $QuickStartFolder/main.bicep

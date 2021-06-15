@@ -23,7 +23,8 @@ git add metadata.json
 git commit -m "Integrate bicep sample $BicepSampleName"
 
 CheckOut $QuickStartFolder $PrPrefix/$BicepSampleName
-cp "$BicepFolder/main.bicep" "$QuickStartFolder"
+Write-Host "Copying $BicepFolder/main.bicep to $QuickStartFolder"
+cp $BicepFolder/*.bicep $QuickStartFolder
 bicep build main.bicep --outfile azuredeploy.json
 & "$ReposRoot/azure-quickstart-templates/test/ci-scripts/Test-LocalSample.ps1" -Fix
 

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.3.255.40792",
+      "templateHash": "12037587194958114466"
+    }
+  },
+  "functions": [],
+  "variables": {
+    "v1": "v1",
+    "v2": "v2",
+    "v3": "[startsWith(concat('abc', 'DEF'), 'hello')]"
+  },
+  "resources": []
+}

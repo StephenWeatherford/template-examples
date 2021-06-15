@@ -1,0 +1,23 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.3.255.40792",
+      "templateHash": "6089279355508623693"
+    }
+  },
+  "functions": [],
+  "variables": {
+    "copy": [
+      {
+        "name": "stuff",
+        "count": "[length(variables('thing'))]",
+        "input": "[int(1)]"
+      }
+    ],
+    "thing": []
+  },
+  "resources": []
+}

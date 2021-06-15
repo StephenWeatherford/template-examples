@@ -1,0 +1,119 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "0.1.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "The location of the Synapse Analytics workspace and Stream Analytics job."
+            }
+        },
+        "synapseAnalyticsWorkspaceName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Synapse Analytics workspace to be used for batch processing and analytics data store."
+            }
+        },
+        "dataLakeStorageAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Data Lake Stroage account."
+            }
+        },
+        "dataLakeStorageFilesystemName": {
+            "type": "string",
+            "defaultValue": "synapse-analytics",
+            "minLength": 3,
+            "maxLength": 63,
+            "metadata": {
+                "description": "The name of the file system to be used with the Azure Data Lake Storage Gen2 account. This name may only contain lowercase letters, numbers, and hyphens, and must begin with a letter or a number. Each hyphen must be preceded and followed by a non-hyphen character. The name must also be between 3 and 63 characters long."
+            }
+        },
+        "sqlAdministratorLogin": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the SQL administrator account."
+            }
+        },
+        "sqlAdministratorLoginPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The password for the SQL administrator account."
+            }
+        },
+        "synapseAnalyticsTagValues": {
+            "type": "object",
+            "defaultValue": {},
+            "metadata": {
+                "description": "Tag values in hash table format."
+            }
+        },
+        "streamAnalyticsJobName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Stream Analytics job."
+            }
+        },
+        "streamAnalyticsJobTagValues": {
+            "type": "object",
+            "defaultValue": {},
+            "metadata": {
+                "description": "Tag values in hash table format."
+            }
+        }
+    },
+    "variables": {
+        "synapseAnalyticsWorkspaceName": "[concat('asynaws-', parameters('synapseAnalyticsWorkspaceName'))]",
+        "managedResourceGroupName": "[concat('asynaws-', parameters('synapseAnalyticsWorkspaceName'), '-managedrg')]",
+        "defaultDataLakeStorageAccountUrl": "[concat('https://', parameters('dataLakeStorageAccountName'), '.dfs.core.windows.net')]",
+        "streamAnalyticsJobName": "[concat('astrajob-', parameters('streamAnalyticsJobName'))]",
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Synapse/workspaces",
+            "apiVersion": "2019-06-01-preview",
+            "name": "[variables('synapseAnalyticsWorkspaceName')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('synapseAnalyticsTagValues')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "defaultDataLakeStorage": {
+                    "accountUrl": "[variables('defaultDataLakeStorageAccountUrl')]",
+                    "filesystem": "[parameters('dataLakeStorageFilesystemName')]"
+                },
+                "sqlAdministratorLogin": "[parameters('sqlAdministratorLogin')]",
+                "sqlAdministratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
+                "managedResourceGroupName": "[variables('managedResourceGroupName')]"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "name": "[concat(parameters('dataLakeStorageAccountName'), '/default/', parameters('dataLakeStorageFilesystemName'))]",
+            "apiVersion": "2018-02-01",
+            "properties": {
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.StreamAnalytics/streamingjobs",
+            "apiVersion": "2017-04-01-preview",
+            "name": "[variables('streamAnalyticsJobName')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('streamAnalyticsJobTagValues')]",
+            "properties": {
+                "sku": {
+                    "name": "Standard"
+                },
+                "eventsOutOfOrderMaxDelayInSeconds": 0,
+                "eventsLateArrivalMaxDelayInSeconds": 5,
+                "compatibilityLevel": "1.2",
+                "contentStoragePolicy": "SystemAccount",
+                "jobType": "Cloud"
+            }
+        }
+    ],
+    "outputs": {}
+}

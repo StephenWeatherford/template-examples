@@ -14,8 +14,10 @@ $QuickStartFolder = GetQuickStartFolder $ReposRoot $quickStartSampleName
 CheckOut $bicepFolder $PrPrefix/$BicepSampleName
 
 $body = @"
-Updated bicep.
+Updated bicep code.
 Copied bicep.main to QuickStart sample in https://github.com/Azure/azure-quickstart-templates$quickStartSampleName
 Added readme to indicate that this sample has now been moved (although it will remain here as well for the time being)
+
+The corresponding PR for the modified quickstart is here: <TODO: Fill in>
 "@
-gh pr create --title "Migrate example: $BicepSampleName" --body $body --repo "Azure/bicep" --label "bicep example migration" --draft --web
+gh pr create --title "Migrate example: $BicepSampleName" --body $body --repo "Azure/bicep" --label "bicep example migration" --draft

@@ -1,20 +1,15 @@
 {
-    // Deploys successfully
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "location": {
-            "type": "string",
-            "metadata": {
-                "description": "description"
-            },
-            "defaultValue": "[resourceGroup().location]"
+            "type": "string"
         }
     },
     "functions": [],
     "variables": {},
-    "resources": {
-        "VNet1": {
+    "resources": [
+        {
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2018-10-01",
             "name": "VNet1",
@@ -26,8 +21,8 @@
                     ]
                 }
             },
-            "resources": {
-                "Subnet1": {
+            "resources": [
+                {
                     "type": "subnets",
                     "apiVersion": "2018-10-01",
                     "name": "Subnet1",
@@ -38,8 +33,8 @@
                         "addressPrefix": "10.0.0.0/24"
                     }
                 }
-            }
+            ]
         }
-    },
+    ],
     "outputs": {}
 }

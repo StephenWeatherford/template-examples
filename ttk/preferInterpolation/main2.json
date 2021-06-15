@@ -1,0 +1,45 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.3.255.40792",
+      "templateHash": "13997443357677792084"
+    }
+  },
+  "functions": [],
+  "variables": {
+    "myObj": {
+      "val": true
+    },
+    "myArray": [
+      12,
+      34
+    ],
+    "a": [
+      "a",
+      "b",
+      123
+    ],
+    "b": [
+      "c",
+      456
+    ]
+  },
+  "resources": [],
+  "outputs": {
+    "test": {
+      "type": "string",
+      "value": "[format('{0}..{1}', variables('myObj'), variables('myArray'))]"
+    },
+    "test2": {
+      "type": "array",
+      "value": "[concat(variables('a'), variables('b'))]"
+    },
+    "test3": {
+      "type": "string",
+      "value": "[format('{0}{1}', variables('a'), variables('b'))]"
+    }
+  }
+}
