@@ -1,6 +1,6 @@
 param(
-    [string][Parameter(Mandatory = $true)] $NewBranchName,
-    [string] $BicepSampleName, # e.g. "101/sample", or $null for all
+    [string][Parameter(Mandatory = $true)][AllowEmptyString()] $NewBranchName,
+    [string][Parameter(Mandatory = $true)] $BicepSampleNameOrAll, # e.g. "101/sample", or $null for all
     [string] $ReposRoot = "~/repos",
     [string] $PrPrefix = "sw"
 )
@@ -13,12 +13,13 @@ Write-Host "Getting tables..."
 $quickStartTable = GetQuickStartTable
 $conversionsTable = GetBicepConversionsTable
 
-checkout $ReposRoot/bicep main
-git pull
-checkout $ReposRoot/azure-quickstart-templates master
-git pull
-
-CheckOut $ReposRoot/bicep $NewBranchName -New
+if ($NewBranchName) {
+    checkout $ReposRoot/azure-quickstart-templates master
+    git pull
+    checkout $ReposRoot/bicep main
+    git pull
+    CheckOut $ReposRoot/bicep $NewBranchName -New
+}
 
 function Update {
     [CmdletBinding()]
@@ -29,7 +30,7 @@ function Update {
     Write-Host $bsn
 
     $bicepFolder = getBicepFolder $ReposRoot $bsn
-    $row, $QuickStartSampleName, $quickStartMoved, $hasQuickStart = FindQuickStartFromBicepExample $BicepSampleName $quickStartTable $conversionsTable
+    $row, $QuickStartSampleName, $quickStartMoved, $hasQuickStart = FindQuickStartFromBicepExample $bsn $quickStartTable $conversionsTable
     if (!$hasQuickStart) {
         return
     }
@@ -48,8 +49,8 @@ function Update {
     cp $QuickStartFolder/*.bicep $BicepFolder
 }
 
-if ($BicepSampleName) {
-    Update $BicepSampleName
+if ($BicepSampleNameOrAll -ne "all") {
+    Update $BicepSampleNameOrAll
 }
 else {
     $bicepFiles = Get-ChildItem -Recurse "$ReposRoot/bicep/docs/examples" -include "main.bicep" | Select -ExpandProperty FullName
@@ -60,7 +61,6 @@ else {
     }
 }
 
-Write-Host "Updating bicep baselines"
 UpdateBicepBaseline $ReposRoot
 
 #code $bicepFolder/*.bicep $bicepFolder/*.json $bicepFolder/*.md

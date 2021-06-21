@@ -99,7 +99,7 @@ function UpdateBicepBaseline {
         [string][parameter(Mandatory = $true)] $ReposRoot
     )
 
-    Write-Host "Updating the bicep baseline (updating main.json to match main.bicep)"
+    Write-Host "Updating the bicep baselines (updating main.json to match main.bicep)"
     cd "$ReposRoot/bicep/src/Bicep.Core.Samples"
     dotnet test --filter "TestCategory=Baseline&FullyQualifiedName~Bicep.Core.Samples" -- 'TestRunParameters.Parameter(name=\"SetBaseLine\", value=\"true\")'
 }
