@@ -69,7 +69,7 @@ try {
             }
         }
 
-        $r, $QuickStartSampleName, $quickStartMoved = FindQuickStartFromBicepExample $BicepSampleName $t
+        $r, $QuickStartSampleName, $quickStartMoved = FindQuickStartFromBicepExample $BicepSampleName $t -NoCache
 
         if ($null -eq $r) {
             # No match found with quickstarts            

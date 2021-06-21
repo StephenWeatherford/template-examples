@@ -1,7 +1,7 @@
 param(
     [string][Parameter(Mandatory = $true)] $BicepSampleName, # e.g. "101/sample"
     [string] $ReposRoot = "~/repos",
-    [string] $PrPrefix = "sw"
+    [string] $PrPrefix = "sw" #asdf
 )
 
 $ErrorActionPreference = "Stop"
@@ -11,11 +11,10 @@ $bicepFolder = getBicepFolder $ReposRoot $BicepSampleName
 $row, $QuickStartSampleName, $quickStartMoved, $hasQuickStart = FindQuickStartFromBicepExample $BicepSampleName -ThrowIfNotFound
 $QuickStartFolder = GetQuickStartFolder $ReposRoot $quickStartSampleName
 
-CheckOut $QuickStartFolder $PrPrefix/$BicepSampleName
+Write-Host "Bicep: Pushing branch: $PrPrefix/$BicepSampleName"
+checkout $bicepFolder $PrPrefix/$BicepSampleName
+git push
 
-$body = @"
-Added bicep support to this sample by integrating bicep.main from the example in https://github.com/Azure/bicep/tree/main/docs/examples/$BicepSampleName
-
-The corresponding PR for the modified bicep example is here: <TODO: Fill in>
-"@
-gh pr create --title "Migrate bicep example: $BicepSampleName" --body $body --label "bicep example migration" --repo "Azure/azure-quickstart-templates"
+Write-Host "QuickStarts: Pushing branch: $PrPrefix/$BicepSampleName"
+checkout $QuickStartFolder $PrPrefix/$BicepSampleName
+git push

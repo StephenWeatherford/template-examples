@@ -8,13 +8,20 @@ $ErrorActionPreference = "Stop"
 
 Import-Module "$PSScriptRoot/ConvertSamples.psm1" -Force
 $bicepFolder = getBicepFolder $ReposRoot $BicepSampleName
-$row, $QuickStartSampleName, $quickStartMoved = FindQuickStartFromBicepExample $BicepSampleName -ThrowIfNotFound
+$row, $QuickStartSampleName, $quickStartMoved, $hasQuickStart = FindQuickStartFromBicepExample $BicepSampleName -ThrowIfNotFound
 $QuickStartFolder = GetQuickStartFolder $ReposRoot $quickStartSampleName
 $bicepCommand = GetBicepCommand $ReposRoot
+if (!$hasQuickStart) {
+    throw "There's no existing quickstart for this bicep example"
+}
 
 Write-Host "Preparing initial bicep files in bicep repo..."
 checkout $bicepFolder $PrPrefix/$BicepSampleName
-#write-host "bicep decompile $QuickStartFolder/azuredeploy.json --outfile $BicepFolder/main.bicep"
+CreateBicepMovedReadme $bicepFolder $QuickStartSampleName
+cd $bicepFolder
+git add .
+git commit --allow-empty -m "Sync with new quickstart: $QuickStartSampleName"
+
 cp $QuickStartFolder/azuredeploy.json $BicepFolder/main.json
 git add $BicepFolder/*.json
 git commit -m "Original JSON files from the quickstart sample"

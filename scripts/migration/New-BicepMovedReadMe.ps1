@@ -8,7 +8,7 @@ $ErrorActionPreference = "Stop"
 
 Import-Module "$PSScriptRoot/ConvertSamples.psm1" -Force
 $bicepFolder = GetBicepFolder $ReposRoot $BicepSampleName
-$row, $QuickStartSampleName, $quickStartMoved = FindQuickStartFromBicepExample $BicepSampleName -ThrowIfNotFound
+$row, $QuickStartSampleName, $quickStartMoved, $hasQuickStart = FindQuickStartFromBicepExample $BicepSampleName -ThrowIfNotFound
 
 CheckOut $ReposRoot/bicep $PrPrefix/$BicepSampleName
 CreateBicepMovedReadme $bicepFolder $QuickStartSampleName
