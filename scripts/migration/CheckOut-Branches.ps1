@@ -11,7 +11,6 @@ Import-Module "$PSScriptRoot/ConvertSamples.psm1" -Force
 $bicepFolder = getBicepFolder $ReposRoot $BicepSampleName
 $row, $QuickStartSampleName, $quickStartMoved, $hasQuickStart = FindQuickStartFromBicepExample $BicepSampleName -ThrowIfNotFound
 $QuickStartFolder = GetQuickStartFolder $ReposRoot $quickStartSampleName
-$bicepCommand = GetBicepCommand $ReposRoot
 
 Write-Host "Bicep: Checking out: $PrPrefix/$BicepSampleName"
 checkout $bicepFolder $PrPrefix/$BicepSampleName
