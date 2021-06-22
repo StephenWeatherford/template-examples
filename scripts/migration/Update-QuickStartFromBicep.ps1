@@ -14,8 +14,6 @@ $QuickStartFolder = GetQuickStartFolder $ReposRoot $quickStartSampleName
 cd $bicepFolder
 CheckOut $ReposRoot/bicep $PrPrefix/$BicepSampleName
 
-UpdateBicepBaseline $ReposRoot
-
 CheckOut $QuickStartFolder $PrPrefix/$BicepSampleName
 
 updateDateInMetadata $quickStartFolder
@@ -35,3 +33,5 @@ cd $quickStartFolder
 git add .
 
 code $QuickStartFolder/main.bicep $QuickStartFolder/azuredeploy.json $QuickStartFolder/README.md $QuickStartFolder/metadata.json
+
+UpdateBicepBaseline $ReposRoot
