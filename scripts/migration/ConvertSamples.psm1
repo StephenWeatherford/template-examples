@@ -1,5 +1,4 @@
 $PersistentFile = "$env:HOME/.persistentValues"
-
 function SetPersistentValue(
     [string][parameter(Mandatory = $true)] $key,
     [string][parameter(Mandatory = $true)] $value) {
@@ -246,4 +245,3 @@ function FindQuickStartFromBicepExample {
 
     return $r, $quickStartSampleName, $quickStartMoved, $hasQuickStart
 }
-    
