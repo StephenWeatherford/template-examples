@@ -14,7 +14,7 @@ param(
     [string]$TableName = "QuickStartsMetadataService",
     $ResultDeploymentLastTestDateParameter = "PublicLastTestDate", # sort based on the cloud we're testing (FairfaxLastTestDate or PublicLastTestDate)
     $ResultDeploymentParameter = "PublicDeployment", # PublicDeployment or FairfaxDeployment
-    $OutputFilename = "~/Business/bicepsamples"
+    $OutputFilename = "~/Business/bicepsamples-status"
 )
 
 $BicepRepoPath = "$ReposRoot/bicep"

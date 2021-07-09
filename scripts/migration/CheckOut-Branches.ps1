@@ -20,3 +20,6 @@ checkout $QuickStartFolder $PrPrefix/$BicepSampleName
 
 code $bicepFolder/main.bicep
 code $QuickStartFolder/main.bicep
+
+Write-Warning $bicepFolder
+Write-Warning $quickStartFolder
