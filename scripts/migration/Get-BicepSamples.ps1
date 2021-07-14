@@ -26,6 +26,7 @@ try {
     CheckOut $ReposRoot/bicep main
 
     $t = GetQuickStartTable
+    $conversionsTable = GetBicepConversionsTable
 
     # # Get all the quickstart samples from disk
     # $ArtifactFilePaths = Get-ChildItem $QuickStartsRepoPath\metadata.json -Recurse -File | ForEach-Object -Process { $_.FullName }
@@ -54,7 +55,7 @@ try {
         $sampleAuthor = & git log --pretty=format:'%an' $bicepPath | tail -1 # Author who checked in the first version of the example
 
         # Does the bicep example have the migration readme?
-        $bicepConverted = $false
+        $bicepExamplePushed = $false
         $exampleReadmeFn = "$folder/README-MOVED.md"
         if (!(Test-Path $exampleReadmeFn)) {
             $exampleReadmeFn = "$folder/README.md"
@@ -65,32 +66,34 @@ try {
         if (Test-Path $exampleReadmeFn) {
             $exampleReadme = Get-Content $exampleReadmeFn
             if ($exampleReadme -like "*This sample has been moved*") {
-                $bicepConverted = $true
+                $bicepExamplePushed = $true
             }
         }
 
-        $r, $QuickStartSampleName, $quickStartMoved = FindQuickStartFromBicepExample $BicepSampleName $t -NoCache
+        $r, $QuickStartSampleName, $quickStartMoved, $hasQuickStart = FindQuickStartFromBicepExample $BicepSampleName $t $conversionsTable -NoCache
 
         if ($null -eq $r) {
             # No match found with quickstarts            
 
             $row = [PSCustomObject]@{
-                Totals              = ""
-                Name                = $bicepSampleName
-                Status              = "Not a QuickStart"
-                QuickStartConverted = $IsBicepQuickStart
-                BicepConverted      = $bicepConverted
-                BicepPR             = ""
-                QuickStartPR        = $null
-                BicepAuthor         = ""
-                QuickStartAuthor    = ""
+                Totals             = ""
+                Name               = $bicepSampleName
+                Status             = "Not a QuickStart"
+                HasQuickStartPR    = "" 
+                HasBicepPR         = ""
+                QuickStartPushed   = ""
+                bicepExamplePushed = ""
+                QuickStartPR       = ""
+                BicepPR            = ""
+                BicepAuthor        = ""
+                QuickStartAuthor   = ""
                 #BicepPath          = $bicepFolder
-                BestPracticeResult  = ""
+                BestPracticeResult = ""
                 #FairfaxDeployment  = ""
-                PublicDeployment    = ""
-                BicepUri            = ""
-                QuickStartUri       = ""
-                QuickStartMoved     = ""
+                PublicDeployment   = ""
+                BicepUri           = ""
+                QuickStartUri      = ""
+                QuickStartMoved    = ""
             } 
         }
         else {
@@ -98,20 +101,20 @@ try {
             $BestPracticeResultOk = $r.BestPracticeResult -eq "PASS"
             #$FairfaxDeploymentOk = $r.FairfaxDeployment -ne "FAIL"
             $PublicDeploymentOk = $r.PublicDeployment -ne "FAIL"
-            $IsBicepQuickStart = $r.BicepVersion -gt ""
+            $QuickStartHasBicep = $r.BicepVersion -gt ""
             $Failed = @(($BestPracticeResultOk ? "" : "Best Practices"), ($PublicDeploymentOk ? "" : "Public deployment"))
             | Where-Object { $_ -ne "" }
             $ReadyToConvert = $BestPracticeResultOk -and $PublicDeploymentOk
             if (!$ReadyToConvert -and !$Failed) {
                 throw "Quickstart sample not ready to convert, but didn't find what failed"
             }
-            if ($IsBicepQuickStart -and $bicepConverted) {
+            if ($QuickStartHasBicep -and $bicepExamplePushed) {
                 $Status = "DONE"
             }
-            elseif ($IsBicepQuickStart) {
+            elseif ($QuickStartHasBicep) {
                 $Status = "IN PROGRESS: Quickstart converted"
             }
-            elseif ($bicepConverted) {
+            elseif ($bicepExamplePushed) {
                 $Status = "IN PROGRESS: Example converted"
             }
             else {
@@ -119,22 +122,24 @@ try {
             }
 
             $row = [PSCustomObject]@{
-                Totals              = ""
-                Name                = $bicepSampleName
-                Status              = $Status
-                QuickStartConverted = $IsBicepQuickStart ? "QuickStart converted" : ""
-                BicepConverted      = $bicepConverted ? "Bicep converted" : ""
-                BicepPR             = ""
-                QuickStartPR        = $null
-                BicepAuthor         = $sampleAuthor
-                QuickStartAuthor    = $r.GitHubUserName
+                Totals             = ""
+                Name               = $bicepSampleName
+                Status             = $Status
+                HasQuickStartPR    = "" # Filled in later
+                HasBicepPR         = "" # Filled in later
+                QuickStartPushed   = $QuickStartHasBicep ? "TRUE" : ""
+                bicepExamplePushed = $bicepExamplePushed ? "TRUE" : ""
+                QuickStartPR       = "" # Filled in later
+                BicepPR            = "" # Filled in later
+                BicepAuthor        = $sampleAuthor
+                QuickStartAuthor   = $r.GitHubUserName
                 #BicepPath          = $bicepFolder
-                BestPracticeResult  = $r.BestPracticeResult
+                BestPracticeResult = $r.BestPracticeResult
                 #FairfaxDeployment  = $r.FairfaxDeployment
-                PublicDeployment    = $r.PublicDeployment
-                BicepUri            = "https://github.com/Azure/bicep/tree/main/$bicepFolder"
-                QuickStartUri       = "https://github.com/Azure/azure-quickstart-templates/tree/master/$quickStartSampleName"
-                QuickStartMoved     = $quickStartMoved
+                PublicDeployment   = $r.PublicDeployment
+                BicepUri           = "https://github.com/Azure/bicep/tree/main/$bicepFolder"
+                QuickStartUri      = "https://github.com/Azure/azure-quickstart-templates/tree/master/$quickStartSampleName"
+                QuickStartMoved    = $quickStartMoved
             }
         }
 
@@ -150,7 +155,7 @@ $sorted = $outputRows | Sort-Object -Property @{Expression = "Status"; Descendin
 $statuses = $outputRows | select -Property "Status" -Unique
 
 cd $BicepRepoPath
-& gh pr list --label "bicep example migration" | Tee-Object -Variable prs
+& gh pr list --label "bicep example migration" -s all | Tee-Object -Variable prs
 $prs = $prs -split "`n`r"
 foreach ($pr in $prs) {
     if ($pr -match "^([0-9]+).*([0-9][0-9][0-9]/[a-zA-Z0-9-]+)") {
@@ -162,6 +167,8 @@ foreach ($pr in $prs) {
         }
 
         $r.BicepPR = "https://github.com/Azure/bicep/pull/$bicepPR"
+        $r.HasBicepPR = "TRUE"
+
     }
     else {
         throw "Could not parse PR text: $pr"
@@ -169,7 +176,7 @@ foreach ($pr in $prs) {
 }
 
 cd $QuickStartRepoPath
-& gh pr list --label "bicep example migration" | Tee-Object -Variable prs
+& gh pr list --label "bicep example migration" -s all | Tee-Object -Variable prs
 $prs = $prs -split "`n`r"
 foreach ($pr in $prs) {
     if ($pr -match "^([0-9]+).*([0-9][0-9][0-9]/[a-zA-Z0-9-]+)") {
@@ -181,6 +188,7 @@ foreach ($pr in $prs) {
         }
 
         $r.QuickStartPR = "https://github.com/Azure/azure-quickstart-templates/pull/$QuickStartPR"
+        $r.HasQuickStartPR = "TRUE"
     }
     else {
         throw "Could not parse PR text: $pr"

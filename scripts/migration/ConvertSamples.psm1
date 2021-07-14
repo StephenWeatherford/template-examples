@@ -164,6 +164,7 @@ function FindQuickStartFromBicepExample {
 
     $quickStartMoved = $false
     $hasQuickStart = $false
+    $quickStartSampleName = $null
 
     $level = split-path (Split-Path $bicepSampleName -Parent) -Leaf # This is the name of the parent folder ("101", "201", etc.)
     $sampleShortName = Split-Path $bicepSampleName -Leaf
