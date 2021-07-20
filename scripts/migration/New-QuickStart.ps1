@@ -3,7 +3,8 @@ param(
     [string][Parameter(Mandatory = $false)] $BicepSampleName = "101/cyclecloud", # e.g. "101/sample"
     [string][Parameter(Mandatory = $false)] $QuickStartSampleName = "quickstarts/microsoft.compute/vm-cyclecloud", # e.g. 
     [string] $ReposRoot = "~/repos",
-    [string] $PrPrefix = "sw" #asdf
+    [string] $PrPrefix = "sw", #asdf
+    [boolean] $PR = $true
 )
 
 $ErrorActionPreference = "Stop"
@@ -36,7 +37,8 @@ Write-Host "AUTHOR: $SampleAuthor"
 # git commit --allow-empty -m "Sync with new quickstart: $QuickStartSampleName"
 
 Write-Host "Preparing initial files in quickstarts repo..."
-checkout $QuickStartFolder $PrPrefix/new/$BicepSampleName -new
+$PRName = "$PrPrefix/new/$BicepSampleName"
+checkout $QuickStartFolder $PRName -new
 git commit -m --allow-empty "New quickstart from bicep: $BicepSampleName"
 
 cp $BicepFolder/main.json $QuickStartFolder/azuredeploy.json
@@ -85,7 +87,7 @@ $metadata = @"
     "description": "TODO",
     "summary": "TODO",
     "type": "QuickStart",
-    "githubUsername": "TODO (author's git name is $sampleAuthor)",
+    "githubUsername": "$sampleAuthor (TODO: find correct github username)",
     "dateUpdated": "$(get-date -format "yyyy-MM-dd")"
 }
 "@
@@ -97,6 +99,20 @@ git commit -m "Create draft supporting files"
 code $QuickStartFolder/*.bicep $QuickStartFolder/README.md $QuickStartFolder/azuredeploy.json $QuickStartFolder/metadata.json
 
 # Fix readme links
-& "$ReposRoot/azure-quickstart-templates/test/ci-scripts/Test-LocalSample.ps1" -Fix
+$ErrorActionPreference = "Continue"
+& "$ReposRoot/azure-quickstart-templates/test/ci-scripts/Test-LocalSample.ps1" -Fix -ErrorAction Ignore | out-null 2>&1
+$ErrorActionPreference = "Stop"
+git add ./README.md
 git commit -m "Fix readme links"
 
+git push --set-upstream origin $PRName
+
+# PR
+if ($PR) {
+    $body = @"
+Created a new QuickStart sample from the bicep example in https://github.com/Azure/bicep/tree/main/docs/examples/$BicepSampleName
+
+See the contribution guide here: https://github.com/Azure/azure-quickstart-templates/blob/master/1-CONTRIBUTION-GUIDE/README.md
+"@
+    gh pr create --title "New from bicep example: $BicepSampleName" --body $body --label "bicep example migration" --repo "Azure/azure-quickstart-templates"
+}
