@@ -1,5 +1,6 @@
 param(
-    [string][Parameter(Mandatory = $true)] $BicepSampleName, # e.g. "101/sample"
+    [string][Parameter(Mandatory = $false)] $BicepSampleName = "101/cyclecloud", # e.g. "101/sample"
+    [string][Parameter(Mandatory = $false)] $QuickStartSampleName = "quickstarts/microsoft.compute/vm-cyclecloud", # e.g. 
     [string] $ReposRoot = "~/repos",
     [string] $PrPrefix = "sw" #asdf
 )
@@ -8,28 +9,33 @@ $ErrorActionPreference = "Stop"
 
 Import-Module "$PSScriptRoot/ConvertSamples.psm1" -Force
 $bicepFolder = getBicepFolder $ReposRoot $BicepSampleName
-$row, $QuickStartSampleName, $quickStartMoved, $hasQuickStart = FindQuickStartFromBicepExample $BicepSampleName -ThrowIfNotFound
-if ($hasQuickStart) {
-    throw "There's already an existing quickstart for this bicep example"
-}
+#$row, $QuickStartSampleNameExisting, $quickStartMoved, $hasQuickStart = FindQuickStartFromBicepExample $BicepSampleName
+#if ($hasQuickStart) {
+#    throw "There's already an existing quickstart for this bicep example"
+#}
 
 cd "$ReposRoot/azure-quickstart-templates"
 $resolvedQuickStarts = $PWD.Path
 mkdir -v "$($resolvedQuickStarts)/$($quickStartSampleName)"
 
-$QuickStartFolder = GetQuickStartFolder $ReposRoot $quickStartSampleName    
+$QuickStartFolder = GetQuickStartFolder $ReposRoot $quickStartSampleName
 $bicepCommand = GetBicepCommand $ReposRoot
 
-Write-Host "Preparing initial bicep files in bicep repo..."
+# ... get original author
+$bicepFolder = GetBicepFolder $ReposRoot $BicepSampleName
+Set-Location $BicepFolder
+$sampleAuthor = & git log --pretty=format:'%an' $bicepPath | tail -1 # Author who checked in the first version of the example
+Write-Host "AUTHOR: $SampleAuthor"
 
-checkout $bicepFolder $PrPrefix/$BicepSampleName
-CreateBicepMovedReadme $bicepFolder
-cd $bicepFolder
-git add .
-git commit --allow-empty -m "Sync with new quickstart: $QuickStartSampleName"
+#Write-Host "Preparing initial bicep files in bicep repo..."
+# checkout $bicepFolder $PrPrefix/$BicepSampleName -New
+# CreateBicepMovedReadme $bicepFolder
+# cd $bicepFolder
+# git add .
+# git commit --allow-empty -m "Sync with new quickstart: $QuickStartSampleName"
 
 Write-Host "Preparing initial files in quickstarts repo..."
-checkout $QuickStartFolder $PrPrefix/$BicepSampleName
+checkout $QuickStartFolder $PrPrefix/new/$BicepSampleName -new
 git commit -m --allow-empty "New quickstart from bicep: $BicepSampleName"
 
 cp $BicepFolder/main.json $QuickStartFolder/azuredeploy.json
@@ -39,7 +45,9 @@ git commit -m "Original files from $BicepSampleName"
 
 # Readme
 if (Test-Path $bicepFolder/README.md) {
-    cp $bicepFolder/README.md $QuickStartFolder
+    echo 'TODO: Clean up README' > $QuickStartFolder/README.md
+    cat $bicepFolder/README.md >> $QuickStartFolder/README.md
+    
 }
 else {
     Set-Content $QuickStartFolder/README.md "# TODO: Create ReadMe"
@@ -75,7 +83,7 @@ $metadata = @"
     "description": "TODO",
     "summary": "TODO",
     "type": "QuickStart",
-    "githubUsername": "TODO",
+    "githubUsername": "TODO (author's git name is $sampleAuthor)",
     "dateUpdated": "$(get-date -format "yyyy-MM-dd")"
 }
 "@
