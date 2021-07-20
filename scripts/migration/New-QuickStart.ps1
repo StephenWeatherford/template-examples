@@ -1,3 +1,4 @@
+# Creates a new quickstart sample from a Bicep example that doesn't already come from a quickstart
 param(
     [string][Parameter(Mandatory = $false)] $BicepSampleName = "101/cyclecloud", # e.g. "101/sample"
     [string][Parameter(Mandatory = $false)] $QuickStartSampleName = "quickstarts/microsoft.compute/vm-cyclecloud", # e.g. 
@@ -45,18 +46,19 @@ git commit -m "Original files from $BicepSampleName"
 
 # Readme
 if (Test-Path $bicepFolder/README.md) {
-    echo 'TODO: Clean up README' > $QuickStartFolder/README.md
-    cat $bicepFolder/README.md >> $QuickStartFolder/README.md
-    
+    cat $bicepFolder/README.md > $QuickStartFolder/README.md
+    echo '' >> $QuickStartFolder/README.md
+    echo 'TODO: Clean up README' >> $QuickStartFolder/README.md
 }
 else {
     Set-Content $QuickStartFolder/README.md "# TODO: Create ReadMe"
 }
 
-# Params file
+# Create params file
 $template = Get-Content $QuickStartFolder/azuredeploy.json | ConvertFrom-JSON
 $params = $template.parameters.psobject.properties.name
-$paramsJson = $params | ForEach-Object { """$_"": {value:""TODO""}" }
+$paramsWithNoDefault = $params | where-object { $template.parameters.$_.defaultValue -eq $null }
+$paramsJson = $paramsWithNoDefault | ForEach-Object { """$_"": {value:""TODO""}" }
 $paramsFile = @'
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
@@ -92,7 +94,7 @@ Set-Content $QuickStartFolder/metadata.json $metadata
 git add $QuickStartFolder/*.*
 git commit -m "Create draft supporting files"
 
-code $QuickStartFolder/main.bicep $QuickStartFolder/README.md $QuickStartFolder/azuredeploy.json $QuickStartFolder/metadata.json
+code $QuickStartFolder/*.bicep $QuickStartFolder/README.md $QuickStartFolder/azuredeploy.json $QuickStartFolder/metadata.json
 
 # Fix readme links
 & "$ReposRoot/azure-quickstart-templates/test/ci-scripts/Test-LocalSample.ps1" -Fix
