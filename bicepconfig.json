@@ -3,7 +3,13 @@
         "core": {
             "enabled": true,
             "rules": {
+                "adminusername-should-not-be-literal": {
+                    "level": "warning"
+                },
                 "no-hardcoded-env-urls": {
+                    "level": "warning"
+                },
+                "no-unnecessary-dependson": {
                     "level": "warning"
                 },
                 "no-unused-params": {
