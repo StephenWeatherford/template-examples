@@ -1,0 +1,67 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.8.9.13224",
+      "templateHash": "7076805196841986469"
+    }
+  },
+  "parameters": {
+    "pass_adminUsername": {
+      "type": "string"
+    },
+    "fail_adminPasswordInt": {
+      "type": "int"
+    },
+    "fail_adminPassword": {
+      "type": "string"
+    },
+    "fail_ADMINpassword2": {
+      "type": "string"
+    },
+    "fail_adminPasswords": {
+      "type": "string"
+    },
+    "fail_adminPasswordObject": {
+      "type": "object"
+    },
+    "fail_myAccountKey": {
+      "type": "string"
+    },
+    "pass_secretpermissions": {
+      "type": "string"
+    },
+    "fail_secretmissions": {
+      "type": "string"
+    },
+    "pass_secretVersion": {
+      "type": "string"
+    },
+    "fail_secretVerse": {
+      "type": "string"
+    },
+    "pass_secretUri": {
+      "type": "string"
+    },
+    "pass_secretUrl": {
+      "type": "string",
+      "defaultValue": "default"
+    },
+    "fail_secretUrtext": {
+      "type": "string",
+      "defaultValue": "default"
+    },
+    "pass_secretname": {
+      "type": "string"
+    },
+    "pass_keyVaultSecretName": {
+      "type": "object"
+    },
+    "fail_secretNombre": {
+      "type": "string"
+    }
+  },
+  "resources": []
+}
