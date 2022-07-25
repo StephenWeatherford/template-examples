@@ -1,7 +1,7 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": { },
+    "parameters": {},
     "resources": [
         {
             "name": "outerImplicit",
@@ -44,3 +44,11 @@
         }
     ]
 }
+/*
+
+PS /Users/stephenweatherford/repos/template-examples/ttk/Secure-Params-In-Nested-Deployments/Fail> 
+                                                                    
+  Secure Params In Nested Deployments                                                                                   
+    [-] Secure Params In Nested Deployments (14 ms)                                                                     
+        Microsoft.Resources/deployments/outerImplicit is an outer scope nested deployment that contains a list*() function: , listKeys(
+*/

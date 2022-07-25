@@ -52,3 +52,16 @@
         }
     ]
 }
+/*
+PS /Users/stephenweatherford/repos/template-examples/ttk/Secure-Params-In-Nested-Deployments/Fail> 
+                                                                           
+Validating Fail\outer-implicit.json                                                                                     
+                                                                     
+    [-] Secure Params In Nested Deployments (12 ms)                                                                     
+        Microsoft.Resources/deployments/outerImplicit is an outer scope nested deployment that contains a secureString type parameter: "secure"
+                                                                                                                        
+  Secure String Parameters Cannot Have Default                                                                          
+    [-] Secure String Parameters Cannot Have Default (2 ms)                                                             
+        Parameter secure is a SecureString and must not have a default value unless it is an expression that contains the newGuid() function.
+
+*/
