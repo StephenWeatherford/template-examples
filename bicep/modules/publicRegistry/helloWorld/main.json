@@ -1,0 +1,83 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.10.61.36676",
+      "templateHash": "4051056249968367617"
+    }
+  },
+  "resources": [
+    {
+      "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+      "contentVersion": "1.0.0.0",
+      "metadata": {
+        "prefix": "arm-automanage-bp-devtest-assignment",
+        "description": "Create a Best Practices DevTest Configuration Profile Assignment"
+      },
+      "resources": [
+        {
+          "type": "Microsoft.Automanage/configurationProfileAssignments",
+          "scope": "'Microsoft.Compute/virtualMachines/${1:vmName}",
+          "apiVersion": "2022-05-04",
+          "name": "default",
+          "properties": {
+            "configurationProfile": "/providers/Microsoft.Automanage/bestPractices/AzureBestPracticesDevTest"
+          }
+        }
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "m1",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "name": {
+            "value": "me myself"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.1318.3566",
+              "templateHash": "8019017868553956840"
+            }
+          },
+          "parameters": {
+            "name": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of someone to say hi to."
+              }
+            }
+          },
+          "resources": [],
+          "outputs": {
+            "greeting": {
+              "type": "string",
+              "value": "[format('Hello from Bicep registry - Hi {0}!', parameters('name'))]",
+              "metadata": {
+                "description": "The hello message."
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "greeting": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'm1')).outputs.greeting.value]"
+    }
+  }
+}

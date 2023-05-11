@@ -1,0 +1,11 @@
+{
+  "moduleAliases": {
+    "ts": {},
+    "br": {
+      "me": {
+        "registry": "mcr.microsoft.com",
+        "modulePath": "bicep"
+      }
+    }
+  }
+}
