@@ -1,5 +1,4 @@
-@secure()
-param artifactsLocation string = 'https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/sample-path-for-unit-tests-do-not-change/'
+param artifactsLocation string = deployment().properties.templateLink.uri
 
 @secure()
 param artifactsLocationSasToken string = ''

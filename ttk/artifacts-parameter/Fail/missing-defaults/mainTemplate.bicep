@@ -1,4 +1,4 @@
-//both are missing defaultValues
-param _artifactsLocation string
+param artifactsLocation string = deployment().properties.templateLink.uri
+
 @secure()
-param _artifactsLocationSasToken string
+param artifactsLocationSasToken string = ''

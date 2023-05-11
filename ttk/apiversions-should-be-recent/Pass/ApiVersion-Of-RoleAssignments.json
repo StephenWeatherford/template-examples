@@ -1,9 +1,39 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {},
+    "parameters": {
+        "existingVirtualNetworkName": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "existingSubnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "builtInRoleType": {
+            "type": "int",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "existingServicePrincipalObjectId": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        }
+    },
     "functions": [],
-    "variables": {},
+    "variables": {
+        "builtInRole": [
+
+        ],
+        "vnetSubnetId": ""
+    },
     "resources": [
         {
             "type": "Microsoft.Network/virtualNetworks/subnets/providers/roleAssignments",

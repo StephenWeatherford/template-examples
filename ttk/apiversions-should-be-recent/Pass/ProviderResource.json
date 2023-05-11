@@ -1,6 +1,29 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
+    "variables": {
+        "Azure Maps Data Reader": "Azure Maps Data Reader",
+    },
+    "parameters": {
+        "userAssignedIdentityName": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "mapsAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "guid": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        }
+    },
     "resources": [
         {
             "apiVersion": "2018-09-01-preview",

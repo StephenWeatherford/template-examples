@@ -3,7 +3,12 @@
     "contentVersion": "1.0.0.0",
     "parameters": {},
     "functions": [],
-    "variables": {},
+    "variables": {
+        "storageBlobDataReaderRoleDefinitionId": "value",
+        "roleAssignmentName": "value",
+        "storageAccountName": "value",
+        "dataShareAccountName": "value"
+    },
     "resources": [
         {
             "scope": "[format('Microsoft.Storage/storageAccounts/{0}', variables('storageAccountName'))]",

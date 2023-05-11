@@ -1,8 +1,8 @@
 {
-    "$schema":  "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "resources":  [
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "resources": [
     {
-      "apiVersion": "2017-12-01-preview",  // there also exists a 2017-12-01-preview apiVersion...
+      "apiVersion": "2017-12-01-preview", // there also exists a 2017-12-01-preview apiVersion...
       "type": "Microsoft.DBforMySQL/servers",
       "name": "db]",
       "location": "westeurope",
@@ -13,5 +13,5 @@
         "sslEnforcement": "Disabled"
       }
     }
-    ]
+  ]
 }

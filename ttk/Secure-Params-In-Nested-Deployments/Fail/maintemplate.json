@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.8.9.13224",
+      "templateHash": "852311978525361687"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "nested",
+      "properties": {
+        "mode": "Complete",
+        "expressionEvaluationOptions": {
+          "scope": "outer"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "nested2",
+      "properties": {
+        "mode": "Complete",
+        "template": {
+          "type": "Microsoft.Resources/deployments",
+          "apiVersion": "2021-04-01",
+          "name": "nestedTemplate",
+          "properties": {
+            "expressionEvaluationOptions": {
+              "scope": "outer"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
