@@ -1,38 +1,53 @@
 ﻿{
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string"
+        }
+    },
     "resources": [
         {
+            "name": "namespace1",
             "type": "Microsoft.ServiceBus/namespaces",
             "apiVersion": "2018-01-01-preview",
+            "location": "[parameters('location')]",
             "resources": [
                 {
+                    "name": "namespace1/queue1/namespace1b",
                     "type": "Microsoft.ServiceBus/namespaces/queues/authorizationRules",
                     "apiVersion": "2017-04-01"
                 }
-            ]
+            ],
+            "properties": {}
         },
         {
+            "name": "namespace2",
             "type": "Microsoft.ServiceBus/namespaces",
             "apiVersion": "2018-01-01-preview",
+            "location": "[parameters('location')]",
             "resources": [
                 {
+                    "name": "queue1/namespace2b",
                     "type": "authorizationRules",
                     "apiVersion": "2017-04-01"
                 }
-            ]
+            ],
+            "properties": {}
         },
         {
+            "name": "namespace3",
             "type": "Microsoft.ServiceBus/namespaces",
             "apiVersion": "2018-01-01-preview",
+            "location": "[parameters('location')]",
             "resources": [
                 {
+                    "name": "namespace1/namespace3b",
                     "type": "queues/authorizationRules",
                     "apiVersion": "2017-04-01"
                 }
-            ]
+            ],
+            "properties": {}
         }
     ]
 }
-
-

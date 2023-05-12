@@ -3,10 +3,12 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "_artifactsLocation": { //both are missing defaultValues
-            "type": "string"
+            "type": "string",
+            "defaultValue": "[deployment().properties.templateLink.uri]"
         },
         "_artifactsLocationSasToken": {
-            "type": "securestring"
+            "type": "securestring",
+            "defaultValue": ""
         }
     },
     "resources": [

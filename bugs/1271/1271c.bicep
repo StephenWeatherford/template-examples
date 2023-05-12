@@ -1,7 +1,7 @@
 @description('description')
 param azureAdminUpn string
 
-var location = 'value'
+var location = 'westus'
 var autoAccountName = 'value'
 var identityName = 'value'
 var devOpsProjectName = 'value'
