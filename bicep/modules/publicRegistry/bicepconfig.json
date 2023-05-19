@@ -1,0 +1,11 @@
+{
+  "moduleAliases": {
+    "ts": {},
+    "br": {
+      "saw": {
+        "registry": "sawbicep.azurecr.io"
+        //"modulePath": ""
+      }
+    }
+  }
+}
