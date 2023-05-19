@@ -1,3 +1,5 @@
+metadata description = 'This is a description for publicRegistry/helloWorld'
+
 module m1 'br/me:samples/hello-world:1.0.2' = {
   name: 'm1'
   params: {
