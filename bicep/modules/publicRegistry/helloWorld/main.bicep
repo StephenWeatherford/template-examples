@@ -8,8 +8,7 @@ List registries:
 az acr repository list --name sawbicep --output table
 > misc/deep-stuff/and-deeper/and-deeper/just-right/modules/storage
 
-bicep publish main.bicep --target br:sawbicep.azurecr.io/misc/deep-stuff/and-deeper/and-deeper/just-right/modules/storage:v2 --documentationUri https://www.contoso.com/exampleregistry.html
-
+~/repos/bicep/src/Bicep.Cli/bin/Debug/net7.0/bicep publish main.bicep --target br:sawbicep.azurecr.io/misc/deep-stuff/and-deeper/and-deeper/just-right/modules/storage:v3 --documentationUri https://www.contoso.com/exampleregistry.html
 */
 
 metadata description = 'This is a description for publicRegistry/helloWorld'
