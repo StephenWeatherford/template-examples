@@ -1,0 +1,13 @@
+{
+  // See https://aka.ms/bicep/config for more information on Bicep configuration options
+  // Press CTRL+SPACE/CMD+SPACE at any location to see Intellisense suggestions
+  "moduleAliases": {
+    "ts": {
+      "sawbicep": {
+        "resourceGroup": "sawbicep",
+        "subscription": "e5ef2b13-6478-4887-ad57-1aa6b9475040"
+      }
+    },
+    "br": {}
+  }
+}

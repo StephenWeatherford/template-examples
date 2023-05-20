@@ -1,7 +1,7 @@
 /*
 
 Show login server name: 
-az acr show --resource-group sawbicep --name  sawbicep --query loginServer
+az acr show --resource-group sawbicep --name sawbicep --query loginServer
 > "sawbicep.azurecr.io"
 
 List registries:
