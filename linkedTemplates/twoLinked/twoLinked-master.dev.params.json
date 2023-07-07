@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "linkedTemplatesLocation": {
-            "value": "https://github.com/StephenWeatherford/template-examples/tree/master/linkedTemplates/twoLinked/templates"
+            "value": "https://raw.githubusercontent.com/StephenWeatherford/template-examples/master/linkedTemplates/twoLinked/templates/library"
         }
     }
 }
