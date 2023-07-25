@@ -1,5 +1,8 @@
+metadata description = 'description'
+
 @minLength(3)
 @maxLength(11)
+@sys.description('hello')
 param namePrefix string
 param location string = resourceGroup().location
 
