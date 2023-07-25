@@ -29,5 +29,11 @@
                 }
             }
         }
+    },
+    "cloud": {
+        "credentialPrecedence": [
+            "AzureCLI"
+        ],
+        "currentProfile": "AzureCloud"
     }
 }
