@@ -22,7 +22,7 @@ az acr manifest list-metadata --registry sawbicep --name misc/deep-stuff/and-dee
 
 ~/repos/bicep/src/Bicep.Cli/bin/Debug/net7.0/bicep publish ~/repos/template-examples/bicep/modules/privateRegistry/helloWorld/main.bicep --target br:sawbicep.azurecr.io/misc/deep-stuff/and-deeper/and-deeper/just-right/modules/storage:v4 --documentationUri https://www.contoso.com/exampleregistry.html
 
-~/repos/bicep/src/Bicep.Cli/bin/Debug/net7.0/bicep publish ~/repos/template-examples/bicep/modules/privateRegistry/helloWorld/main.bicep --target br:sawbicep.azurecr.io/storage:test --documentationUri https://www.contoso.com/exampleregistry.html
+~/repos/bicep/src/Bicep.Cli/bin/Debug/net7.0/bicep publish ~/repos/template-examples/bicep/modules/privateRegistry/helloWorld/main.bicep --target br:sawbicep.azurecr.io/storage:test5 --documentationUri https://www.contoso.com/exampleregistry.html
 
  */
 
