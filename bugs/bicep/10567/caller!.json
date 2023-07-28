@@ -1,0 +1,113 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.19.5.34762",
+      "templateHash": "2186372395584273138"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "a",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.19.75.57299",
+              "templateHash": "18328979321897914582"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2022-09-01",
+              "name": "a",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.19.75.57299",
+                      "templateHash": "7177871078397328439"
+                    },
+                    "description": "Azure Storage is a cloud-based storage service offered by Microsoft that provides highly scalable and durable storage for data and applications. Storage Accounts are the fundamental storage entity in Azure Storage and can be used to store data objects such as blobs, files, queues, tables, and disks.\n\n This Bicep module allows users to create or use existing Storage Accounts with options to control redundancy, access, and security settings. Zone-redundancy allows data to be stored across multiple Availability Zones, increasing availability and durability. Virtual network rules can be used to restrict or allow network traffic to and from the Storage Account. Encryption and TLS settings can be configured to ensure data security.\n \n The module supports both blob and file services, allowing users to store and retrieve unstructured data and files. The output of the module is the ID of the created or existing Storage Account, which can be used in other Azure resource deployments."
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Resources/deployments",
+                      "apiVersion": "2022-09-01",
+                      "name": "m1",
+                      "properties": {
+                        "expressionEvaluationOptions": {
+                          "scope": "inner"
+                        },
+                        "mode": "Incremental",
+                        "parameters": {
+                          "name": {
+                            "value": "me myself"
+                          }
+                        },
+                        "template": {
+                          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                          "contentVersion": "1.0.0.0",
+                          "metadata": {
+                            "_generator": {
+                              "name": "bicep",
+                              "version": "0.4.1318.3566",
+                              "templateHash": "8019017868553956840"
+                            }
+                          },
+                          "parameters": {
+                            "name": {
+                              "type": "string",
+                              "metadata": {
+                                "description": "The name of someone to say hi to."
+                              }
+                            }
+                          },
+                          "resources": [],
+                          "outputs": {
+                            "greeting": {
+                              "type": "string",
+                              "value": "[format('Hello from Bicep registry - Hi {0}!', parameters('name'))]",
+                              "metadata": {
+                                "description": "The hello message."
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "outputs": {
+                    "greeting": {
+                      "type": "string",
+                      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'm1'), '2022-09-01').outputs.greeting.value]"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

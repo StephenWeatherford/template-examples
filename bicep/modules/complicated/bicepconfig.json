@@ -1,0 +1,20 @@
+{
+  "moduleAliases": {
+    "ts": {
+      "sawbicep": {
+        "resourceGroup": "sawbicep",
+        "subscription": "e5ef2b13-6478-4887-ad57-1aa6b9475040"
+      }
+    },
+    "br": {
+      "saw": {
+        "registry": "sawbicep.azurecr.io"
+        //"modulePath": ""
+      }
+    }
+  },
+  "experimentalFeaturesEnabled": {
+    "publishSources": "stripcomments",
+    "showSources": true
+  }
+}

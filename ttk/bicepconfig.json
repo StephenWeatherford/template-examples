@@ -15,8 +15,12 @@
                 },
                 "simplify-interpolation": {
                     "level": "warning"
+                },
+                "use-recent-api-versions": {
+                    "level": "warning"
                 }
             }
         }
     }
+}
 }

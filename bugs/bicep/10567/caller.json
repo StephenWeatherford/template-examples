@@ -1,0 +1,43 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.19.5.34762",
+      "templateHash": "9466861568760171217"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "a",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.19.75.57299",
+              "templateHash": "9570113466357165176"
+            },
+            "description": "10567 main.bicep"
+          },
+          "resources": [],
+          "outputs": {
+            "greeting": {
+              "type": "string",
+              "value": "Greetings, Earthlings!"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
