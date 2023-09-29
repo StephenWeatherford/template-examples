@@ -34,8 +34,6 @@
     </None>
     <Content Include="Deploy-AzureResourceGroup.ps1" />
     <Content Include="images\linkeddeployments.png" />
-    <None Include="metadata.json" />
-    <None Include="README.md" />
   </ItemGroup>
   <Target Name="GetReferenceAssemblyPaths" />
 </Project>
