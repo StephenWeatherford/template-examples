@@ -9,7 +9,7 @@
 /*
 
 Publish:
-~/repos/bicep/src/Bicep.Cli/bin/Debug/net7.0/bicep publish "~/repos/template-examples/bicep/modules/complicated/my entrypoint.bicep" --target br:sawbicep.azurecr.io/complicated:v1 --documentationUri https://www.contoso.com/exampleregistry.html
+~/repos/bicep/src/Bicep.Cli/bin/Debug/net7.0/bicep publish ~/repos/template-examples/bicep/modules/complicated/my\ entrypoint.bicep --target br:sawbicep.azurecr.io/complicated:v1 --documentationUri https://www.contoso.com/exampleregistry.html
 
 Show login server name: 
 az acr show --resource-group sawbicep --name sawbicep --query loginServer
