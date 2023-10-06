@@ -1,0 +1,14 @@
+{
+    "moduleAliases": {
+      "br": {
+        "saw": {
+          "registry": "sawbicep.azurecr.io",
+          "modulePath": "demo"
+        }
+      }
+    },
+    "experimentalFeaturesEnabled": {
+      "publishSource": true
+    }
+  }
+  

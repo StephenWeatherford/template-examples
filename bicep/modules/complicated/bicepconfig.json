@@ -14,7 +14,11 @@
     }
   },
   "experimentalFeaturesEnabled": {
-    "publishSources": "stripcomments",
-    "showSources": true
+    "publishSource": true,
+    "showSources": true,
+    "asserts": true,
+    "compileTimeImports": true,
+    "sourceMapping": true,
+    "userDefinedFunctions": true
   }
 }
