@@ -19,6 +19,10 @@ Example publishing:
 
  Demo Setup:
 
+//v23
+  bicep publish ~/repos/template-examples/bicep/modules/complicated/my\ complicated\ module.bicep --target br:sawbicep.azurecr.io/demo/complicated:v23-1 --force
+  bicep publish ~/repos/template-examples/bicep/modules/complicated/my\ complicated\ module.bicep --target br:sawbicep.azurecr.io/demo/complicated:v23-2 --with-source --force
+
   ~/repos/bicep/src/Bicep.Cli/bin/Debug/net7.0/bicep publish ~/repos/template-examples/bicep/modules/complicated/my\ complicated\ module.bicep --target br:sawbicep.azurecr.io/demo/complicated:v1 --force
   ~/repos/bicep/src/Bicep.Cli/bin/Debug/net7.0/bicep publish ~/repos/template-examples/bicep/modules/complicated/my\ complicated\ module.bicep --target br:sawbicep.azurecr.io/demo/complicated:v2 --with-source --force
 
@@ -53,6 +57,8 @@ param location string
 
 var uniqueStorageName = '${storagePrefix}${uniqueString(resourceGroup().id)}'
 
+// Resources
+
 resource stg 'Microsoft.Storage/storageAccounts@2019-04-01' = {
   name: uniqueStorageName
   location: location
@@ -64,72 +70,6 @@ resource stg 'Microsoft.Storage/storageAccounts@2019-04-01' = {
     supportsHttpsTrafficOnly: true
   }
 }
-
-output storageEndpoint object = stg.properties.primaryEndpoints
-
-
-
-// Public modules
-
-module appConfig 'br/public:app/app-configuration:1.0.1' = {
-  name: 'appConfig'  
-}
-
-module m6 'br/public:app/app-configuration:1.0.1' = {
-  name: 'm6'
-}
-
-module m7 'br/public:app/dapr-containerapps-environment:1.2.2' = {
-  name: 'm7'
-  params: {
-    daprComponentType: 'pubsub.azure.servicebus'
-    location: 'westus2'
-    nameseed: 'stephwe'
-  }
-}
-
-// Template specs
-
-module tsModule 'ts:e5ef2b13-6478-4887-ad57-1aa6b9475040/sawbicep/storageSpec:1.0a' = {
-  name: 'tsModule'
-  params: {
-    loc: 'westus3'
-  }
-}
-
-module tsModule2 'ts/saw:storageSpec:2.0a' = {
-  name: 'tsModule2'
-  params: {
-    loc: 'westus3'
-  }
-}
-
-// Relative paths
-
-module m5 'modules/main.bicep' = {
-  name: 'm5'
-}
-
-module relativePath '../simpleModule/storageAccount.bicep' = {
-  name: 'relative path module'
-  params: {
-    location: 'westus3'
-    storagePrefix: 'stephwe'
-  }
-}
-
-// Absolute file paths - not allowed
-/*
-module absolutePath1 '/Users/stephenweatherford/repos/template-examples/bicep/modules/templatespec/storageacct.bicep' = {
-  name: 'relative path module'
-  params: {
-    location: 'westus3'
-    storagePrefix: 'stephwe'
-  }
-}
-*/
-
-// loadcontent
 
 resource virtualMachine 'Microsoft.Compute/virtualMachines@2020-12-01' = {
   name: 'name'
@@ -156,21 +96,91 @@ resource windowsVMExtensions 'Microsoft.Compute/virtualMachines/extensions@2020-
   }
 }
 
-// module m 'br/saw:misc/deep-stuff/and-deeper/and-deeper/just-right/modules/storage:v1' = {
-//   name: 'm'
-//   params: {
-//     location: 'westus'
-//     storagePrefix: 'saw'
-//   }
-// }
+output storageEndpoint object = stg.properties.primaryEndpoints
 
-// module m2 'br/saw:misc/deep-stuff/and-deeper/and-deeper/just-right/modules/storage:v2' = {
-//   name: 'm2'
-//   params: {}
-// }
+// Linter issues
 
-// module m3 'br/saw:misc/deep-stuff/and-deeper/and-deeper/just-right/modules/storage:v3' = {
-//   name: 'm3'
-//   params: {}
-// }
+resource oldStorage1 'Microsoft.Storage/storageAccounts@2015-06-15' = {
+  name: 'oldStorage1'
+#disable-next-line no-hardcoded-location
+  location: 'westus3'
+}
 
+resource oldStorage2 'Microsoft.Storage/storageAccounts@2015-06-15' = {
+  name: 'oldStorage2'
+  // This is disabled through bicepconfig.json
+  location: 'westus3'
+}
+
+// Public modules - fully qualified
+
+module public1FQ 'br:mcr.microsoft.com/bicep/app/app-configuration:1.0.1' = {
+  name: 'public1FQ'  
+}
+
+module public2FQ 'br:mcr.microsoft.com/bicep/storage/storage-account:1.0.1' = {
+  name: 'public2FQ'
+  params: {
+    location: 'westus3'
+  }
+}
+
+// Public modules - using default alias
+
+module public1PublicAlias 'br/public:app/app-configuration:1.0.1' = {
+  name: 'public1PublicAlias'  
+}
+
+module public2PublicAlias 'br/public:storage/storage-account:1.0.1' = {
+  name: 'public2PublicAlias'
+  params: {
+    location: 'westus3'
+  }
+}
+
+// Public modules - using private alias
+
+module public1PrivateAlias 'br/privatebicep:app/app-configuration:1.0.1' = {
+  name: 'public1PrivateAlias'
+}
+
+module public2PrivateAlias 'br/privatebicep:storage/storage-account:1.0.1' = {
+  name: 'public2PrivateAlias'
+  params: {
+    location: 'westus3'
+  }
+}
+
+// Template specs
+
+module tsModule 'ts:e5ef2b13-6478-4887-ad57-1aa6b9475040/sawbicep/storageSpec:1.0a' = {
+  name: 'tsModule'
+  params: {
+    loc: 'westus3'
+  }
+}
+
+module tsModule2 'ts/saw:storageSpec:2.0a' = {
+  name: 'tsModule2'
+  params: {
+    loc: 'westus3'
+  }
+}
+
+// Local modules (only relative path are allowed)
+
+module m5 'modules/main.bicep' = {
+  name: 'm5'
+}
+
+module relativePath '../simpleModule/storageAccount.bicep' = {
+  name: 'relative path module'
+  params: {
+    location: 'westus3'
+    storagePrefix: 'stephwe'
+  }
+}
+
+// loadcontent
+
+output myscript string = loadTextContent('files/my script.ps1')

@@ -16,9 +16,9 @@
       }
     },
     "br": {
-      "privatebicep": {
-        "registry": "mcr.microsoft.com",
-        "modulePath": "bicep"
+      "demo": {
+        "registry": "sawbicep.azurecr.io",
+        "modulePath": "demo"
       }
     }
   },
