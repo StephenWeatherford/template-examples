@@ -1,7 +1,7 @@
 {
   "moduleAliases": {
     "ts": {
-      "sawbicep": {
+      "saw": {
         "resourceGroup": "sawbicep",
         "subscription": "e5ef2b13-6478-4887-ad57-1aa6b9475040"
       }
