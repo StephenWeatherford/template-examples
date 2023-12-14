@@ -71,31 +71,6 @@ resource stg 'Microsoft.Storage/storageAccounts@2019-04-01' = {
   }
 }
 
-resource virtualMachine 'Microsoft.Compute/virtualMachines@2020-12-01' = {
-  name: 'name'
-  location: location
-}
-
-resource windowsVMExtensions 'Microsoft.Compute/virtualMachines/extensions@2020-12-01' = {
-  parent: virtualMachine
-  name: 'name'
-  location: location
-  properties: {
-    publisher: 'Microsoft.Compute'
-    type: 'CustomScriptExtension'
-    typeHandlerVersion: '1.10'
-    autoUpgradeMinorVersion: true
-    settings: {
-      fileUris: [
-        'fileUris'
-      ]
-    }
-    protectedSettings: {
-      commandToExecute: loadTextContent('files/my script.ps1')
-    }
-  }
-}
-
 output storageEndpoint object = stg.properties.primaryEndpoints
 
 // Linter issues
@@ -184,3 +159,30 @@ module relativePath '../simpleModule/storageAccount.bicep' = {
 // loadcontent
 
 output myscript string = loadTextContent('files/my script.ps1')
+
+// loadcontent
+
+resource virtualMachine 'Microsoft.Compute/virtualMachines@2020-12-01' = {
+  name: 'name'
+  location: location
+}
+
+resource windowsVMExtensions 'Microsoft.Compute/virtualMachines/extensions@2020-12-01' = {
+  parent: virtualMachine
+  name: 'name'
+  location: location
+  properties: {
+    publisher: 'Microsoft.Compute'
+    type: 'CustomScriptExtension'
+    typeHandlerVersion: '1.10'
+    autoUpgradeMinorVersion: true
+    settings: {
+      fileUris: [
+        'fileUris'
+      ]
+    }
+    protectedSettings: {
+      commandToExecute: loadTextContent('files/my script.ps1')
+    }
+  }
+}
