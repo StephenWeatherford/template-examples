@@ -15,7 +15,6 @@
   },
   "experimentalFeaturesEnabled": {
     "publishSource": true,
-    "showSources": true,
     "asserts": true,
     "compileTimeImports": true,
     "sourceMapping": true,

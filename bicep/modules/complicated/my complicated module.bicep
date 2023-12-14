@@ -7,9 +7,23 @@ This Bicep module allows users to create or use existing Storage Accounts with o
 The module supports both blob and file services, allowing users to store and retrieve unstructured data and files. The output of the module is the ID of the created or existing Storage Account, which can be used in other Azure resource deployments.'''
 
 /*
-~/repos/bicep/src/Bicep.Cli/bin/Debug/net7.0/bicep publish ~/repos/template-examples/bicep/modules/complicated/my\ complicated\ module.bicep --target br:sawbicep.azurecr.io/demo/complicated:v1
-Publish-AzBicepModule -FilePath "$HOME/repos/template-examples/bicep/modules/complicated/my complicated module.bicep" -Target br:sawbicep.azurecr.io/demo/complicated:v1-pwsh-ws -WithSource -Verbose
- */
+
+Example publishing:
+
+  ~/repos/bicep/src/Bicep.Cli/bin/Debug/net7.0/bicep publish ~/repos/template-examples/bicep/modules/complicated/my\ complicated\ module.bicep --target br:sawbicep.azurecr.io/demo/complicated:v1
+  Publish-AzBicepModule -FilePath "$HOME/repos/template-examples/bicep/modules/complicated/my complicated module.bicep" -Target br:sawbicep.azurecr.io/demo/complicated:v1-pwsh-ws -WithSource -Verbose
+
+*/
+
+/*
+
+ Demo Setup:
+
+  ~/repos/bicep/src/Bicep.Cli/bin/Debug/net7.0/bicep publish ~/repos/template-examples/bicep/modules/complicated/my\ complicated\ module.bicep --target br:sawbicep.azurecr.io/demo/complicated:v1 --force
+  ~/repos/bicep/src/Bicep.Cli/bin/Debug/net7.0/bicep publish ~/repos/template-examples/bicep/modules/complicated/my\ complicated\ module.bicep --target br:sawbicep.azurecr.io/demo/complicated:v2 --with-source --force
+
+*/
+
 
 output greeting string = m1.outputs.greeting
 
