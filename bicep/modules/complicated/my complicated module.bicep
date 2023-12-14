@@ -158,10 +158,6 @@ module relativePath '../simpleModule/storageAccount.bicep' = {
 
 // loadcontent
 
-output myscript string = loadTextContent('files/my script.ps1')
-
-// loadcontent
-
 resource virtualMachine 'Microsoft.Compute/virtualMachines@2020-12-01' = {
   name: 'name'
   location: location
