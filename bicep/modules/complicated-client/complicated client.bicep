@@ -77,3 +77,36 @@ module modComplicatedv23v2 'br/demo:complicated:v23-v2' = {
   dependsOn: [
   ]
 }
+
+// metadata version 1
+
+module modComplicatedmv1 'br/demo:complicated:metadatav1' = {
+  name: 'modComplicatedmv1'
+  params: {
+    location: 'westus3'
+    storagePrefix: 'stephwe'
+  }
+  dependsOn: [
+  ]
+}
+
+module modComplicatedmv2 'br/demo:complicated:metadatav1-nofiles' = {
+  name: 'modComplicatedmv2'
+  params: {
+    location: 'westus3'
+    storagePrefix: 'stephwe'
+  }
+  dependsOn: [
+  ]
+}
+
+// Has minimum version requirement
+module modComplicated_minVersion 'br/demo:complicated:min-version' = {
+  name: 'modComplicated_minVersion'
+  params: {
+    location: 'westus3'
+    storagePrefix: 'stephwe'
+  }
+  dependsOn: [
+  ]
+}
