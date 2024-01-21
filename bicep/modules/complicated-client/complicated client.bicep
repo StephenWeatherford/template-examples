@@ -100,9 +100,30 @@ module modComplicatedmv2 'br/demo:complicated:metadatav1-nofiles' = {
   ]
 }
 
-// Has minimum version requirement
-module modComplicated_minVersion 'br/demo:complicated:min-version' = {
-  name: 'modComplicated_minVersion'
+// Metadata versions
+
+module modComplicated_metadata_neg1 'br/demo:complicated:v2-metadata-1' = {
+  name: 'v2-metadata-neg1'
+  params: {
+    location: 'westus3'
+    storagePrefix: 'stephwe'
+  }
+  dependsOn: [
+  ]
+}
+
+module modComplicated_metadata_0 'br/demo:complicated:v2-metadata0' = {
+  name: 'v2-metadata-0'
+  params: {
+    location: 'westus3'
+    storagePrefix: 'stephwe'
+  }
+  dependsOn: [
+  ]
+}
+
+module modComplicated_metadata_1 'br/demo:complicated:v2-metadata1' = {
+  name: 'v2-metadata-1'
   params: {
     location: 'westus3'
     storagePrefix: 'stephwe'
