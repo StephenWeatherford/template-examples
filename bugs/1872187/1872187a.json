@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "p1": {
+      "type": "string",
+      "defaultValue": "p1"
+    }
+  },
+  "functions": [],
+  "variables": {},
+  "resources": [],
+  "outputs": {
+    "output1": {
+      "type": "object",
+      //"value": "[\n {\n    \"a\":\"@{parameters('p1')}]"
+    //   "value": "[{\"a\":\"@{parameters('p1')}]"
+      //"value": "[{\"a\":\"@{parameters('p1')}]"
+    //   "value": "[\n {\n    \"sharedstoragecontainer\":\"@{pipeline().parameters.SharedStorageContainerMessiahSystem}\",\n    \"sharedstorageiffilefolder\":\"@{pipeline().parameters.SharedStorageIFFileFolderMessiahSystem}\"\n }\n]",
+    "value": "[{\"ssc\":\"@{pipeline().parameters.SSCMS}\",\n    \"ssff\":\"@{pipeline().parameters.SSIFFFMS}\"\n }\n]",
+    },
+    "output2": {
+      "type": "string",
+      "value": "SELECT a AS b,c\n    FROM @{concat(variables('d'),'e')} \n    WHERE f IS NOT NULL"
+    }
+  }
+}

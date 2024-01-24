@@ -1,0 +1,12 @@
+{
+    "moduleAliases": {
+      "br": {
+        "ms": {
+          "registry": "mcr.microsoft.com"
+        },
+        "msbicep": {
+          "registry": "mcr.microsoft.com/bicep"
+        }
+      }
+    }
+  }

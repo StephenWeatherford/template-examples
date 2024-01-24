@@ -1,0 +1,73 @@
+main layer: sha256:31a3cbf5eeca0edd667b3927f072692e264f4e5379a8badb4299b51bf9667b3f
+main config: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+
+
+// Main manifest
+// sawbicep.azurecr.io/storage:test
+sha256:8df46e076d75ccf7fd3968e585f43e2e4b6186be95abb5d12bc562af20c97154
+{
+    "schemaVersion": 2,
+    "artifactType": "application/vnd.ms.bicep.module.artifact",
+    "config": {
+      "mediaType": "application/vnd.ms.bicep.module.config.v1+json",
+      "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    "layers": [
+      {
+        "mediaType": "application/vnd.ms.bicep.module.layer.v1+json",
+        "digest": "sha256:31a3cbf5eeca0edd667b3927f072692e264f4e5379a8badb4299b51bf9667b3f",
+        "size": 2029
+      }
+    ],
+    "annotations": {}
+  }
+
+
+//  me attached:
+config blob: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855, size 0
+layer blob: sha256:c848e1013f9f04a9d63fa43ce7fd4af035152c7c669a4a404b67107cee5f2e4e size 10
+manifest: sha256:379a7dfbdad1d3b5f30e00eb38ad4589798d055a23c07c7b071352c5b406fc97
+{
+    "schemaVersion": 2,
+    "artifactType": "application/vnd.oci.image.manifest.v1+json",
+    "config": {
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    "layers": [],
+    "subject": {
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "digest": "sha256:8df46e076d75ccf7fd3968e585f43e2e4b6186be95abb5d12bc562af20c97154",
+      "size": 521
+    },
+    "annotations": {}
+  }
+
+// oras-attached
+sha256:d8040168f9126db505cf2938a1f68c066548f69c01d0eeecb7f54aede0ffa1d9
+{
+    "schemaVersion": 2,
+    "mediaType": "application/vnd.oci.image.manifest.v1+json",
+    "config": {
+      "mediaType": "hello/example",
+      "digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "size": 2
+    },
+    "layers": [
+      {
+        "mediaType": "application/vnd.oci.image.layer.v1.tar",
+        "digest": "sha256:14fe8fc0a4630e5ca5a1afc7853f103edc95063a80e4b2a7a0052f687a7c9e26",
+        "size": 1040,
+        "annotations": { "org.opencontainers.image.title": "main.bicep" }
+      }
+    ],
+    "subject": {
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "digest": "sha256:8df46e076d75ccf7fd3968e585f43e2e4b6186be95abb5d12bc562af20c97154",
+      "size": 521
+    },
+    "annotations": { "org.opencontainers.image.created": "2023-07-07T22:24:27Z" }
+  }
+s  

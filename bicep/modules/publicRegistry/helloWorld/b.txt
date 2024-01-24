@@ -1,0 +1,24 @@
+//  me attached:
+sha256:1de60ab033101bb2eb73c7ec22dc83cbed1517341f3cc5e4077bca0b8dea765d
+
+{
+    "schemaVersion": 2,
+    "artifactType": "application/vnd.ms.bicep.module.artifact",
+    "config": {
+      "mediaType": "application/vnd.ms.bicep.module.config.v1+json",
+      "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0,
+      "annotations": {}
+    },
+    "layers": [
+      {
+        "mediaType": "application/vnd.ms.bicep.module.layer.v1+json",
+        "digest": "sha256:33eaae298e368c8d2909eb721d7f3a4e72a0fcbf3718e0ae7b500d0a095d8fe5",
+        "size": 2029,
+        "annotations": {}
+      }
+    ],
+    "annotations": {
+      "org.opencontainers.image.description": "This module is designed to demonstrate a module's short description which would tell what the module is for."
+    }
+  }

@@ -1,0 +1,400 @@
+{
+  "id": "/subscriptions/871f2c0d-ee0f-445b-990c-1d1fc4411914/resourceGroups/BFHL-DEV-PAAS-RG/providers/Microsoft.Synapse/workspaces/insightrx-uat-synapse-analytics/pipelines/Mysql_Delta_master",
+  "name": "Mysql_Delta_master",
+  "type": "Microsoft.Synapse/workspaces/pipelines",
+  "etag": "4900d2a4-0000-2000-0000-624d557b0000",
+  "properties": {
+    "activities": [
+      {
+        "name": "Listing",
+        "type": "ExecutePipeline",
+        "dependsOn": [
+          {
+            "activity": "hrxlabs",
+            "dependencyConditions": ["Succeeded", "Failed"]
+          }
+        ],
+        "userProperties": [],
+        "typeProperties": {
+          "pipeline": {
+            "referenceName": "PL_BFHL_LISTING_DATALAKE",
+            "type": "PipelineReference"
+          },
+          "waitOnCompletion": true,
+          "parameters": {
+            "move_to_delta": false,
+            "move_to_landing": true,
+            "p_source_name": "listing"
+          }
+        }
+      },
+      {
+        "name": "UpdateSuccessStatus",
+        "type": "Lookup",
+        "dependsOn": [
+          {
+            "activity": "Listing",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "policy": {
+          "timeout": "7.00:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "source": {
+            "type": "AzureMySqlSource",
+            "query": {
+              "value": "update data_integration_audit set status='Succeeded',run_end='@{formatDateTime(addhours(addminutes(utcnow(),30),5),'yyyy-MM-dd HH:mm:ss')}'where status='InProgress' and '@{activity('Listing').output.pipelineName}'='PL_BFHL_Listing_DATALAKE';select 1;",
+              "type": "Expression"
+            },
+            "queryTimeout": "02:00:00"
+          },
+          "dataset": {
+            "referenceName": "Dataset_MonitorDB_UAT",
+            "type": "DatasetReference",
+            "parameters": {}
+          }
+        }
+      },
+      {
+        "name": "UpdateFailStatus",
+        "type": "Lookup",
+        "dependsOn": [
+          {
+            "activity": "Listing",
+            "dependencyConditions": ["Failed"]
+          }
+        ],
+        "policy": {
+          "timeout": "7.00:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "source": {
+            "type": "AzureMySqlSource",
+            "query": {
+              "value": "update data_integration_audit set status='Failed',run_end='@{formatDateTime(addhours(addminutes(utcnow(),30),5),'yyyy-MM-dd HH:mm:ss')}'where status='InProgress' and '@{activity('Listing').output.pipelineName}'='PL_BFHL_Listing_DATALAKE';select 1;",
+              "type": "Expression"
+            },
+            "queryTimeout": "02:00:00"
+          },
+          "dataset": {
+            "referenceName": "Dataset_MonitorDB_UAT",
+            "type": "DatasetReference",
+            "parameters": {}
+          }
+        }
+      },
+      {
+        "name": "PartnerIntegration",
+        "type": "ExecutePipeline",
+        "dependsOn": [
+          {
+            "activity": "Listing",
+            "dependencyConditions": ["Succeeded", "Failed"]
+          }
+        ],
+        "userProperties": [],
+        "typeProperties": {
+          "pipeline": {
+            "referenceName": "PL_BFHL_PARTNER_INTEGRATION_DATALAKE",
+            "type": "PipelineReference"
+          },
+          "waitOnCompletion": true,
+          "parameters": {
+            "move_to_delta": false,
+            "move_to_landing": true
+          }
+        }
+      },
+      {
+        "name": "UpdateSuccess pi",
+        "type": "Lookup",
+        "dependsOn": [
+          {
+            "activity": "PartnerIntegration",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "policy": {
+          "timeout": "7.00:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "source": {
+            "type": "AzureMySqlSource",
+            "query": {
+              "value": "update data_integration_audit set status='Succeeded',run_end='@{formatDateTime(addhours(addminutes(utcnow(),30),5),'yyyy-MM-dd HH:mm:ss')}'where status='InProgress' and '@{activity('PartnerIntegration').output.pipelineName}'='PL_BFHL_PARTNER_INTEGRATION_DATALAKE';select 1;",
+              "type": "Expression"
+            },
+            "queryTimeout": "02:00:00"
+          },
+          "dataset": {
+            "referenceName": "Dataset_MonitorDB_UAT",
+            "type": "DatasetReference",
+            "parameters": {}
+          }
+        }
+      },
+      {
+        "name": "UpdateFailStatus pi",
+        "type": "Lookup",
+        "dependsOn": [
+          {
+            "activity": "PartnerIntegration",
+            "dependencyConditions": ["Failed"]
+          }
+        ],
+        "policy": {
+          "timeout": "7.00:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "source": {
+            "type": "AzureMySqlSource",
+            "query": {
+              "value": "update data_integration_audit set status='Failed',run_end='@{formatDateTime(addhours(addminutes(utcnow(),30),5),'yyyy-MM-dd HH:mm:ss')}'where status='InProgress' and '@{activity('PartnerIntegration').output.pipelineName}'='PL_BFHL_PARTNER_INTEGRATION_DATALAKE';select 1;",
+              "type": "Expression"
+            },
+            "queryTimeout": "02:00:00"
+          },
+          "dataset": {
+            "referenceName": "Dataset_MonitorDB_UAT",
+            "type": "DatasetReference",
+            "parameters": {}
+          }
+        }
+      },
+      {
+        "name": "If Condition1",
+        "type": "IfCondition",
+        "dependsOn": [
+          {
+            "activity": "wait 5 sec",
+            "dependencyConditions": ["Succeeded"]
+          },
+          {
+            "activity": "partnerInt queued",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "userProperties": [],
+        "typeProperties": {
+          "expression": {
+            "value": "@hamed1374 (equals(join(variables('srcs'),','),''''''))",
+            "type": "Expression"
+          },
+          "ifTrueActivities": [
+            {
+              "name": "Landing_To_Raw",
+              "type": "DatabricksNotebook",
+              "dependsOn": [],
+              "policy": {
+                "timeout": "7.00:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureOutput": false,
+                "secureInput": false
+              },
+              "userProperties": [],
+              "typeProperties": {
+                "notebookPath": "/Repos/abhinav.atmuri@bfhl.in/Databricks_Jobs/MySQL_landing_to_delta/Mysql Delta",
+                "baseParameters": {
+                  "start_time": "{<!-- -->{start_time}}",
+                  "source_container_name": {
+                    "value": "@fr (variables('srcs'),',')",
+                    "type": "Expression"
+                  },
+                  "audit_columns": "(id,Platform,data_source,job_source,job_target,Job_Type,Job_Name,run_start,run_end,Status,RunID,Error_logs)",
+                  "run_id": "{<!-- -->{run_id}}",
+                  "scope_name": "Secret-scope-delta-uat",
+                  "delta_config_columns": "Id,object_name,primary_key,nested_table,source_container_name,target_container_name,landing_storage_account,delta_storage_name,last_run_date,first_time_run,history,current,last_run_path,isactive,mobile_hash_column,email_hash_column,column_list",
+                  "newColAlert": "alakmar.shafin@bajajfinserv.in"
+                }
+              },
+              "linkedServiceName": {
+                "referenceName": "AzureDatabricks",
+                "type": "LinkedServiceReference"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "wait 5 sec",
+        "type": "Wait",
+        "dependsOn": [
+          {
+            "activity": "PartnerIntegration",
+            "dependencyConditions": ["Succeeded", "Failed"]
+          }
+        ],
+        "userProperties": [],
+        "typeProperties": {
+          "waitTimeInSeconds": 10
+        }
+      },
+      {
+        "name": "hrxlabs",
+        "type": "ExecutePipeline",
+        "dependsOn": [],
+        "userProperties": [],
+        "typeProperties": {
+          "pipeline": {
+            "Type": "PipelineReference",
+            "ReferenceName": "Labs_Datalake_Audit_Pipeline"
+          },
+          "waitOnCompletion": true,
+          "parameters": {
+            "move_to_delta": false,
+            "move_to_landing": true,
+            "p_source_name": "hrxlabs"
+          }
+        }
+      },
+      {
+        "name": "UpdateFailStatus_copy1",
+        "type": "Lookup",
+        "dependsOn": [
+          {
+            "activity": "hrxlabs",
+            "dependencyConditions": ["Failed"]
+          }
+        ],
+        "policy": {
+          "timeout": "7.00:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "source": {
+            "type": "AzureMySqlSource",
+            "query": {
+              "value": "update data_integration_audit set status='Failed',run_end='@{formatDateTime(addhours(addminutes(utcnow(),30),5),'yyyy-MM-dd HH:mm:ss')}'where status='InProgress' and '@{activity('hrxlabs').output.pipelineName}'='PL_BFHL_Listing_DATALAKE';select 1;",
+              "type": "Expression"
+            },
+            "queryTimeout": "02:00:00"
+          },
+          "dataset": {
+            "referenceName": "Dataset_MonitorDB_UAT",
+            "type": "DatasetReference",
+            "parameters": {}
+          }
+        }
+      },
+      {
+        "name": "UpdateSuccessStatus3",
+        "type": "Lookup",
+        "dependsOn": [
+          {
+            "activity": "hrxlabs",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "policy": {
+          "timeout": "7.00:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "source": {
+            "type": "AzureMySqlSource",
+            "query": {
+              "value": "update data_integration_audit set status='Succeeded',run_end='@{formatDateTime(addhours(addminutes(utcnow(),30),5),'yyyy-MM-dd HH:mm:ss')}'where status='InProgress' and '@{activity('hrxlabs').output.pipelineName}'='PL_BFHL_LABS_DATALAKE';select 1;",
+              "type": "Expression"
+            },
+            "queryTimeout": "02:00:00"
+          },
+          "dataset": {
+            "referenceName": "Dataset_MonitorDB_UAT",
+            "type": "DatasetReference",
+            "parameters": {}
+          }
+        }
+      },
+      {
+        "name": "hrxlabs queued",
+        "type": "AppendVariable",
+        "dependsOn": [
+          {
+            "activity": "hrxlabs",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "userProperties": [],
+        "typeProperties": {
+          "variableName": "srcs",
+          "value": "'hrxlabs'"
+        }
+      },
+      {
+        "name": "listing queued",
+        "type": "AppendVariable",
+        "dependsOn": [
+          {
+            "activity": "Listing",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "userProperties": [],
+        "typeProperties": {
+          "variableName": "srcs",
+          "value": "'listing'"
+        }
+      },
+      {
+        "name": "partnerInt queued",
+        "type": "AppendVariable",
+        "dependsOn": [
+          {
+            "activity": "PartnerIntegration",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "userProperties": [],
+        "typeProperties": {
+          "variableName": "srcs",
+          "value": "'partner-integration'"
+        }
+      }
+    ],
+    "policy": {
+      "elapsedTimeMetric": {},
+      "cancelAfter": {}
+    },
+    "variables": {
+      "srcs": {
+        "type": "Array",
+        "defaultValue": []
+      }
+    },
+    "folder": {
+      "name": "Datalake"
+    },
+    "annotations": [],
+    "lastPublishTime": "2022-04-06T08:55:23Z"
+  }
+}
