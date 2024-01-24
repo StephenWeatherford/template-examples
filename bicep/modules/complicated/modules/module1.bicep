@@ -1,8 +1,4 @@
-﻿/*
-
-~/repos/bicep/src/Bicep.Cli/bin/Debug/net7.0/bicep publish ~/repos/template-examples/bicep/modules/complicated/my\ entrypoint.bicep --target br:sawbicep.azurecr.io/complicated:v1
-
- */
+﻿// I am module #1
 
 metadata description = '''Azure Storage is a cloud-based storage service offered by Microsoft that provides highly scalable and durable storage for data and applications. Storage Accounts are the fundamental storage entity in Azure Storage and can be used to store data objects such as blobs, files, queues, tables, and disks.
 

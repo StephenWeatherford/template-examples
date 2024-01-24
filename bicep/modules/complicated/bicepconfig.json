@@ -13,8 +13,8 @@
       }
     }
   },
+  //"cacheRootDirectory": "w:\\cache2",
   "experimentalFeaturesEnabled": {
-    "publishSources": "stripcomments",
-    "showSources": true
+    "publishSource": true
   }
 }

@@ -1,15 +1,11 @@
-// TODO: loadcontent
-// TODO: bicepconfig.json
-// TODO: templateSpec
-// TODO: Json templates
-// TODO: relative paths
-// Absolute paths - not allowed
-// Absolute URIs - not allowed (only registry paths)
-
 /*
 
-Publish:
-~/repos/bicep/src/Bicep.Cli/bin/Debug/net7.0/bicep publish "~/repos/template-examples/bicep/modules/complicated/my entrypoint.bicep" --target br:sawbicep.azurecr.io/complicated:v1 --documentationUri https://www.contoso.com/exampleregistry.html
+Publish (from "repos" root):
+
+bicep\src\Bicep.Cli\bin\Debug\net7.0\bicep publish "template-examples/bicep/modules/complicated/my # entrypoint.bicep" --target br:sawbicep.azurecr.io/complicated:v1 --documentationUri https://www.contoso.com/exampleregistry.html --with-source
+bicep/src/Bicep.Cli/bin/Debug/net7.0/bicep publish "template-examples/bicep/modules/complicated/my # entrypoint.bicep" --target br:sawbicep.azurecr.io/complicated:v1 --documentationUri https://www.contoso.com/exampleregistry.html --with-source
+
+az bicep publish -f "template-examples/bicep/modules/complicated/my # entrypoint.bicep" --target br:sawbicep.azurecr.io/complicated:v1 --documentationUri https://www.contoso.com/exampleregistry.html --with-source
 
 Show login server name: 
 az acr show --resource-group sawbicep --name sawbicep --query loginServer
@@ -42,8 +38,25 @@ az acr manifest list-metadata --registry sawbicep --name misc/deep-stuff/and-dee
  This Bicep module allows users to create or use existing Storage Accounts with options to control redundancy, access, and security settings. Zone-redundancy allows data to be stored across multiple Availability Zones, increasing availability and durability. Virtual network rules can be used to restrict or allow network traffic to and from the Storage Account. Encryption and TLS settings can be configured to ensure data security.
  
  The module supports both blob and file services, allowing users to store and retrieve unstructured data and files. The output of the module is the ID of the created or existing Storage Account, which can be used in other Azure resource deployments.'''
+
  
- module m1 'br/public:samples/hello-world:1.0.2' = {
+ module module1 './modules/module1.bicep' = {
+  name: 'module1'
+}
+
+module module1b './../complicated/modules/module1.bicep' = {
+  name: 'module1b'
+}
+
+module module1c 'modules/abc/../module1.bicep' = {
+  name: 'module1c'
+}
+
+module module1d 'modules/module1.bicep' = {
+  name: 'module1d'
+}
+
+module m1 'br/public:samples/hello-world:1.0.2' = {
    name: 'm1'
    params: {
      name: 'me myself'
@@ -148,9 +161,16 @@ module tsModule2 'ts/sawbicep:storageSpec:2.0a' = {
   }
 }
 
+module tsModule3 'ts/sawbicep:storageSpec:2.0a' = {
+  name: 'tsModule3'
+  params: {
+    loc: 'westus3'
+  }
+}
+
 // Relative paths
 
-module m5 'modules/main.bicep' = {
+module m5 './modules/module1.bicep' = {
   name: 'm5'
 }
 
