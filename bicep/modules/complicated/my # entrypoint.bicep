@@ -154,14 +154,14 @@ module tsModule 'ts:e5ef2b13-6478-4887-ad57-1aa6b9475040/sawbicep/storageSpec:1.
   }
 }
 
-module tsModule2 'ts/sawbicep:storageSpec:2.0a' = {
+module tsModule2 'ts/saw:storageSpec:2.0a' = {
   name: 'tsModule2'
   params: {
     loc: 'westus3'
   }
 }
 
-module tsModule3 'ts/sawbicep:storageSpec:2.0a' = {
+module tsModule3 'ts/saw:storageSpec:2.0a' = {
   name: 'tsModule3'
   params: {
     loc: 'westus3'
