@@ -2,10 +2,10 @@
 
 Publish (from "repos" root):
 
-bicep\src\Bicep.Cli\bin\Debug\net7.0\bicep publish "template-examples/bicep/modules/complicated/my # entrypoint.bicep" --target br:sawbicep.azurecr.io/complicated:v1 --documentationUri https://www.contoso.com/exampleregistry.html --with-source
-bicep/src/Bicep.Cli/bin/Debug/net7.0/bicep publish "template-examples/bicep/modules/complicated/my # entrypoint.bicep" --target br:sawbicep.azurecr.io/complicated:v1 --documentationUri https://www.contoso.com/exampleregistry.html --with-source
+bicep\src\Bicep.Cli\bin\Debug\net8.0\bicep publish "template-examples/bicep/modules/complicated/my # entrypoint.bicep" --target br:sawbicep.azurecr.io/demo/complicated:v1 --documentationUri https://www.contoso.com/exampleregistry.html --with-source
+bicep/src/Bicep.Cli/bin/Debug/net8.0/bicep publish "template-examples/bicep/modules/complicated/my # entrypoint.bicep" --target br:sawbicep.azurecr.io/demo/complicated:v1 --documentationUri https://www.contoso.com/exampleregistry.html --with-source
 
-az bicep publish -f "template-examples/bicep/modules/complicated/my # entrypoint.bicep" --target br:sawbicep.azurecr.io/complicated:v1 --documentationUri https://www.contoso.com/exampleregistry.html --with-source
+az bicep publish -f "template-examples/bicep/modules/complicated/my # entrypoint.bicep" --target br:sawbicep.azurecr.io/demo/complicated:v1 --documentationUri https://www.contoso.com/exampleregistry.html --with-source
 
 Show login server name: 
 az acr show --resource-group sawbicep --name sawbicep --query loginServer

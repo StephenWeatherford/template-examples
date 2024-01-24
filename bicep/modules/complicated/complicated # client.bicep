@@ -1,4 +1,4 @@
-module m1 'br/saw:complicated:v1' = {
+module m1 'br:sawbicep.azurecr.io/demo/complicated:v24' = {
   name: 'complicated'
   params: {
     location: 'westus3'
