@@ -23,11 +23,16 @@
       "saw": {
         "registry": "sawbicep.azurecr.io",
         "modulePath": "demo"
+      },
+      "internal": {
+        "registry": "sawbiceppublic.azurecr.io",
+        "modulePath": "sourcetest/avm/automation"
       }
     }
   },
   //"cacheRootDirectory": "w:\\cache2",
   "experimentalFeaturesEnabled": {
-    "publishSource": true
+    "publishSource": true,
+    "optionalModuleNames": true
   }
 }

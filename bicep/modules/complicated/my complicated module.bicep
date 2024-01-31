@@ -30,6 +30,17 @@ Example publishing:
 */
 
 
+
+// Equivalent to: br:sawbiceppublic.azurecr.io/sourcetest/avm/automation/automation-account:v1.0.1
+module automation_account3 'br/internal:automation-account:v1.0.1' = {
+  params: {
+    name: 'automationAccount'
+  }
+}
+
+
+
+
 output greeting string = m1.outputs.greeting
 
 module m1 'br/public:samples/hello-world:1.0.2' = {
