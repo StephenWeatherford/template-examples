@@ -1,3 +1,13 @@
+// INTERESTING:
+// automation/automation-account
+module automation_account2 'br:sawbiceppublic.azurecr.io/sourcetest/avm/automation/automation-account:v1.0.1' = {
+  name: 'automation-account2'
+  params: {}
+}
+
+
+
+
 
 // analysis-services/server
 module server 'br:sawbiceppublic.azurecr.io/sourcetest/avm/analysis-services/server:v1.0.1' = {
