@@ -1,4 +1,4 @@
-// ~/repos/bicep/src/Bicep.Cli/bin/Debug/net7.0/bicep publish '/Users/stephenweatherford/repos/template-examples/bicep/modules/spaces/my main bicep file.bicep' --target br:sawbicep.azurecr.io/spaces:v1
+// ~/repos/bicep/src/Bicep.Cli/bin/Debug/net8.0/bicep publish '/Users/stephenweatherford/repos/template-examples/bicep/modules/spaces/my main bicep file.bicep' --target br:sawbicep.azurecr.io/spaces:v1
 
 metadata description = 'description'
 
