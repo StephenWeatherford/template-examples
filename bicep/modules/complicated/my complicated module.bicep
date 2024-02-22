@@ -39,6 +39,14 @@ module m1 'br/public:samples/hello-world:1.0.2' = {
   }
 }
 
+module publicipprefix 'br/public:avm/res/network/public-ip-prefix:0.2.1' = {
+  name: 'public-ip-prefix'
+  params: {
+    name: 'm1'
+    prefixLength: 28  
+  }
+}
+
 @minLength(3)
 @maxLength(11)
 param storagePrefix string
@@ -147,6 +155,9 @@ module tsModule2 'ts/saw:storageSpec:2.0a' = {
 
 module m5 'modules/module1.bicep' = {
   name: 'm5'
+}
+module m5b 'modules/module1.bicep' = {
+  name: 'm5b'
 }
 
 module relativePath '../simpleModule/storageAccount.bicep' = {
