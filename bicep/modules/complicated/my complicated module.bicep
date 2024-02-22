@@ -10,8 +10,8 @@ The module supports both blob and file services, allowing users to store and ret
 
 Example publishing:
 
-  ~/repos/bicep/src/Bicep.Cli/bin/Debug/net7.0/bicep publish ~/repos/template-examples/bicep/modules/complicated/my\ complicated\ module.bicep --target br:sawbicep.azurecr.io/demo/complicated:v1
-  bicep\src\Bicep.Cli\bin\Debug\net7.0\bicep publish "template-examples\bicep\modules\complicated\my complicated module.bicep" --target br:sawbicep.azurecr.io/demo/complicated:v1
+  ~/repos/bicep/src/Bicep.Cli/bin/Debug/net8.0/bicep publish ~/repos/template-examples/bicep/modules/complicated/my\ complicated\ module.bicep --target br:sawbicep.azurecr.io/demo/complicated:v1
+  bicep\src\Bicep.Cli\bin\Debug\net8.0\bicep publish "template-examples\bicep\modules\complicated\my complicated module.bicep" --target br:sawbicep.azurecr.io/demo/complicated:v1
   Publish-AzBicepModule -FilePath "$HOME/repos/template-examples/bicep/modules/complicated/my complicated module.bicep" -Target br:sawbicep.azurecr.io/demo/complicated:v1-pwsh-ws -WithSource -Verbose
 
 */
@@ -24,10 +24,21 @@ Example publishing:
   bicep publish ~/repos/template-examples/bicep/modules/complicated/my\ complicated\ module.bicep --target br:sawbicep.azurecr.io/demo/complicated:v23-1 --force
   bicep publish ~/repos/template-examples/bicep/modules/complicated/my\ complicated\ module.bicep --target br:sawbicep.azurecr.io/demo/complicated:v23-2 --with-source --force
 
-  ~/repos/bicep/src/Bicep.Cli/bin/Debug/net7.0/bicep publish ~/repos/template-examples/bicep/modules/complicated/my\ complicated\ module.bicep --target br:sawbicep.azurecr.io/demo/complicated:v1 --force
-  ~/repos/bicep/src/Bicep.Cli/bin/Debug/net7.0/bicep publish ~/repos/template-examples/bicep/modules/complicated/my\ complicated\ module.bicep --target br:sawbicep.azurecr.io/demo/complicated:v2 --with-source --force
+  ~/repos/bicep/src/Bicep.Cli/bin/Debug/net8.0/bicep publish ~/repos/template-examples/bicep/modules/complicated/my\ complicated\ module.bicep --target br:sawbicep.azurecr.io/demo/complicated:v1 --force
+  ~/repos/bicep/src/Bicep.Cli/bin/Debug/net8.0/bicep publish ~/repos/template-examples/bicep/modules/complicated/my\ complicated\ module.bicep --target br:sawbicep.azurecr.io/demo/complicated:v2 --with-source --force
 
 */
+
+
+
+// Equivalent to: br:sawbiceppublic.azurecr.io/sourcetest/avm/automation/automation-account:v1.0.1
+module automation_account3 'br/internal:automation-account:v1.0.1' = {
+  params: {
+    name: 'automationAccount'
+  }
+}
+
+
 
 
 output greeting string = m1.outputs.greeting

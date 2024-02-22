@@ -1,5 +1,5 @@
 /*
-~/repos/bicep/src/Bicep.Cli/bin/Debug/net7.0/bicep publish ~/repos/template-examples/bicep/modules/deepLink/module1.bicep --target br:sawbicep.azurecr.io/demo/module1:v1
+~/repos/bicep/src/Bicep.Cli/bin/Debug/net8.0/bicep publish ~/repos/template-examples/bicep/modules/deepLink/module1.bicep --target br:sawbicep.azurecr.io/demo/module1:v1
 */
 
 module cogsvc 'br/public:ai/cognitiveservices:1.0.3' = {
