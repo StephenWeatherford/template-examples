@@ -11,7 +11,7 @@ The module supports both blob and file services, allowing users to store and ret
 Example publishing:
 
   ~/repos/bicep/src/Bicep.Cli/bin/Debug/net8.0/bicep publish ~/repos/template-examples/bicep/modules/complicated/my\ complicated\ module.bicep --target br:sawbicep.azurecr.io/demo/complicated:v1
-  bicep\src\Bicep.Cli\bin\Debug\net8.0\bicep publish "template-examples\bicep\modules\complicated\my complicated module.bicep" --target br:sawbicep.azurecr.io/demo/complicated:v1
+  bicep\src\Bicep.Cli\bin\Debug\net8.0\bicep publish "template-examples\bicep\modules\complicated\my complicated module.bicep" --target br:sawbicep.azurecr.io/demo/complicated:v100 --with-source --force
   Publish-AzBicepModule -FilePath "$HOME/repos/template-examples/bicep/modules/complicated/my complicated module.bicep" -Target br:sawbicep.azurecr.io/demo/complicated:v1-pwsh-ws -WithSource -Verbose
 
 */
