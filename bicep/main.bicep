@@ -125,3 +125,15 @@ resource aksCluster 'Microsoft.ContainerService/managedClusters@2017-08-31' = {
     }
   }
 }
+
+
+type superComplexType = {
+  p: string
+  i: 123 | 456
+}
+
+param pp { *: superComplexType } = {
+  a: { p: 'mystring', i: 123 }
+}
+
+param ppp superComplexType
