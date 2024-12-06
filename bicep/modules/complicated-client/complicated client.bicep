@@ -1,10 +1,19 @@
+
+module m 'br:sawbicep.azurecr.io/demo/complicated:v103' = {
+  name: 'm'
+  params: {
+    location: 'westus'
+    storagePrefix: 'stephwe'
+  }
+}
+
 // public module (no source)
 module modCognitiveServices 'br/public:ai/cognitiveservices:1.1.1' = {
   name: 'modCognitiveServices'
 }
 
-// public avm module (no source)
-module modSshPublicKey 'br/public:avm/res/compute/ssh-public-key:0.2.2' = {
+// public avm module (source available)
+module modSshPublicKey 'br/public:avm/res/compute/ssh-public-key:0.2.4' = {
   name: 'modSshPublicKey'
   params: {
     name: 'sshPublicKey'
