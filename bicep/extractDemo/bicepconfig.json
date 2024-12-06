@@ -1,0 +1,41 @@
+{
+  "analyzers": {
+    "core": {
+      "rules": {
+        "no-hardcoded-location": {
+          "level": "off"
+        },
+        "use-recent-module-versions": {
+          "level": "warning"
+        }
+      }
+    }
+  },
+  "moduleAliases": {
+    "ts": {
+      "saw": {
+        "resourceGroup": "sawbicep",
+        "subscription": "e5ef2b13-6478-4887-ad57-1aa6b9475040"
+      }
+    },
+    "br": {
+      "privatebicep": {
+        "registry": "mcr.microsoft.com",
+        "modulePath": "bicep"
+      },
+      "saw": {
+        "registry": "sawbicep.azurecr.io",
+        "modulePath": "demo"
+      },
+      "internal": {
+        "registry": "sawbiceppublic.azurecr.io",
+        "modulePath": "sourcetest/avm/automation"
+      }
+    }
+  },
+  //"cacheRootDirectory": "w:\\cache2",
+  "experimentalFeaturesEnabled": {
+    "optionalModuleNames": true,
+    "extensibility": true
+  }
+}
